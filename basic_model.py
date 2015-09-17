@@ -73,7 +73,7 @@ class isothermalISM(object):
             A[i, i-1] = beta
             A[i, i] = 1 - alpha - beta
             A[i, i+1] = alpha
-            B[i] = (-alpha*self.surface_elev[i+1]) + ((1 + alpha + beta)*self.surface_elev[i]) - (beta*self.surface_elev[i-1]) + (mass_balance*dt)
+            B[i] = (-alpha*self.surface_elev[i+1]) + ((1 + alpha + beta)*self.surface_elev[i]) - (beta*self.surface_elev[i-1]) + (mass_balance[i]*dt)
         
         self.surface_elev, info=linalg.bicgstab(A, B) 
         
@@ -114,8 +114,21 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.show()
 
 run1 = isothermalISM(55, 1000, 0.00001, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
+
+f = open('TAKU_MBAL_DATA.csv', 'r')
+mbal=[]
+count = 0
+for line in f.readlines():
+    count += 1
+    if(count%10==0):
+        data = line.split(',')
+        mbal.append(float(data[1]))
+
+for i in range(20): #stupid hack to deal with continuation past divide
+    mbal.append(6)
+
 for i in range(5000): #5000 years
-    run1.timestep(1,.6)
+    run1.timestep(1, mbal)
     if(i%100==0): 
         print ('on timestep', i)
         run1.write()

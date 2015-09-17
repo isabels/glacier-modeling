@@ -128,6 +128,7 @@ class isothermalISM(object):
 run1 = isothermalISM(55, 1000, 1e-16, .0001) #55 nodes, 1000-meter spacing, glen's A (fixed), basal slip of zero
 run1.openOutput('run1.nc')
 run1.write()
+
 f = open('TAKU_MBAL_DATA.csv', 'r')
 mbal=[]
 count = 0
@@ -136,6 +137,7 @@ for line in f.readlines():
     if(count%10==0):
         data = line.split(',')
         mbal.append(float(data[1]))
+        
 for i in range(5000):
     run1.timestep(1,mbal)
     if(i%100==0): #modulus! when you divide i/100 and the remainder is zero, do this:
