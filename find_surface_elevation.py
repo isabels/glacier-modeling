@@ -1,15 +1,6 @@
 #creates csv with (distance from terminus, elevation) pairs, to load into other code and display
 import math
 import csv
-  #surf_dist = []
-        #surf_elev = []
-        #elev_data = open('surface_elevations.csv', 'r')
-        #for line in elev_data.readlines():
-            #data = line.split(',')
-            #surf_dist.append(float(data[0]))
-            #surf_elev.append(float(data[1]))
-        #mp.plot(surf_dist, surf_elev, 'red')
-
 
 distance = []
 elevation = []

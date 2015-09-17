@@ -11,22 +11,24 @@ from TopoHandler import generateRanTopo
 class isothermalISM(object):
     p = 918 #density of ice
     g = 9.81 #gravitational constant
-    glenns_a = 1e-16 #glenn's flow law constant
+    glenns_a = 1e-18 #glenn's flow law constant, should be 1e-16
     glenns_n = 3 #power of glenn's flow law
     
     def __init__(self,num_nodes,dx,slide_parameter, fname): #initializes the model's fields
-        self.num_nodes = num_nodes 
         self.dx = dx 
         self.slide_parameter = slide_parameter 
+        self.num_nodes = num_nodes + 20
 
         self.time = 0 
         self.x= np.array(range(0,(self.num_nodes*self.dx),self.dx)) 
         self.ice_thickness= np.zeros(self.num_nodes) 
         
         infile = open ('beddata.txt', 'r')
-        numbers = [float(line) for line in infile.readlines()]
-        infile.close
-        self.bed_elev = numbers
+        numbers = [float(line) for line in infile.readlines()] #topmost point is at 1250 m
+        infile.close()
+        self.bed_elev = numbers #+ range(1240, 1040, 10) #sloping back down on far side of divide
+        for i in range(1210, 410, -40):
+            self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
         self.openOutput(fname)
         
@@ -96,7 +98,6 @@ def plot_model_run(fname): #reads and plots data from the output file
     bed = f.variables['bed_elev'][:]
     time = f.variables['time'][:]
     x = f.variables['x'][:]
-    print len(time)
     for i in range (len(time) - 1):
         mp.plot(x, bed[i], 'green')
         mp.plot(x, elev[i], 'blue')
@@ -112,13 +113,13 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
-run1 = isothermalISM(55, 1000, .0001, 'run1.nc') #550 nodes, 100-meter spacing,  basal slip of zero
-for i in range(1500): #5000 years
+run1 = isothermalISM(55, 1000, 0.00001, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
+for i in range(5000): #5000 years
     run1.timestep(1,.6)
     if(i%100==0): 
         print ('on timestep', i)
         run1.write()
-run1.calculate_velocity()   
+#srun1.calculate_velocity()   
 run1.close()
 
 plot_model_run('run1.nc')

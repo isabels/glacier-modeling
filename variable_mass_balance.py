@@ -125,7 +125,7 @@ class isothermalISM(object):
             
 
 
-run1 = isothermalISM(55, 1000, 1e-16, .00001) #55 nodes, 1000-meter spacing, glen's A (fixed), basal slip of zero
+run1 = isothermalISM(55, 1000, 1e-16, .0001) #55 nodes, 1000-meter spacing, glen's A (fixed), basal slip of zero
 run1.openOutput('run1.nc')
 run1.write()
 f = open('TAKU_MBAL_DATA.csv', 'r')
