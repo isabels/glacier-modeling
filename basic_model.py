@@ -6,7 +6,6 @@ import scipy.sparse.linalg as linalg
 import tools
 import scipy.io.netcdf as ncdf
 import matplotlib.pyplot as mp
-from TopoHandler import generateRanTopo 
 
 class isothermalISM(object):
     p = 918 #density of ice
@@ -113,7 +112,7 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
-run1 = isothermalISM(55, 1000, 0.00001, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
+run1 = isothermalISM(55, 1000, 0.0002, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
 
 f = open('TAKU_MBAL_DATA.csv', 'r')
 mbal=[]
