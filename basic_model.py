@@ -96,6 +96,7 @@ def plot_model_run(fname): #reads and plots data from the output file
     bed = f.variables['bed_elev'][:]
     time = f.variables['time'][:]
     x = f.variables['x'][:]
+    print len(time)
     for i in range (len(time) - 1):
         mp.plot(x, bed[i], 'green')
         mp.plot(x, elev[i], 'blue')
@@ -112,7 +113,7 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.show()
 
 run1 = isothermalISM(55, 1000, .0001, 'run1.nc') #550 nodes, 100-meter spacing,  basal slip of zero
-for i in range(5000): #5000 years
+for i in range(1500): #5000 years
     run1.timestep(1,.6)
     if(i%100==0): 
         print ('on timestep', i)
