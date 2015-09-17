@@ -119,7 +119,7 @@ for i in range(5000): #5000 years
     if(i%100==0): 
         print ('on timestep', i)
         run1.write()
-#srun1.calculate_velocity()   
+#run1.calculate_velocity()   
 run1.close()
 
 plot_model_run('run1.nc')
