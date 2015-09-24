@@ -10,7 +10,7 @@ import matplotlib.pyplot as mp
 class isothermalISM(object):
     p = 918 #density of ice
     g = 9.81 #gravitational constant
-    glenns_a = 1e-18 #glenn's flow law constant, should be 1e-16
+    glenns_a = 3.4e-18 #glenn's flow law constant, should be 1e-16
     glenns_n = 3 #power of glenn's flow law
     
     def __init__(self,num_nodes,dx,slide_parameter, fname): #initializes the model's fields
@@ -124,7 +124,7 @@ for line in f.readlines():
         mbal.append(float(data[1]))
 
 for i in range(20): #stupid hack to deal with continuation past divide
-    mbal.append(6)
+    mbal.append(7)
 
 for i in range(5000): #5000 years
     run1.timestep(1, mbal)
