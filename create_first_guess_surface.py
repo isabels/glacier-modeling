@@ -3,6 +3,8 @@
 #currently makes surface as 55-node array. will eventually need to change/parameterize for full model
 
 import numpy as np
+import matplotlib.pyplot as mp
+import csv
 
 #load existing GPS data (stored in dist to terminus, elev format)
 surf_dist = []
@@ -28,13 +30,34 @@ for i in range(len(elevations)):
 		index += 1 #get to GPS data points on either side of current node
 	horz_dist = surf_dist[index + 1] - surf_dist[index]
 	vert_dist = surf_elev[index + 1] - surf_elev[index]
-	print horz_dist, vert_dist
 	frac = (current_dist - surf_dist[index]) / horz_dist
 	elevations[i] = surf_elev[index] + (vert_dist * frac)
 
-print elevations
 
 #ok, so now have interpolated as much as possible from GPS data.
 #time to brute-force guess the last 12 or so!!
 
+elevations[1] = 165
+elevations[2] = 210
+elevations[3] = 230
+elevations[4] = 250
+elevations[5] = 300
+elevations[6] = 350
+elevations[7] = 400
+elevations[8] = 450
+elevations[9] = 500
+elevations[10] = 525
+elevations[11] = 550
+elevations[12] = 600
+
+#plot things to make sure they still look reasonable
+# mp.plot(surf_dist, surf_elev, 'red')
+# mp.plot(x_distances, elevations, 'blue')
+# mp.show()
+
+#save to ANOTHER CSV! (for now just saving elevations. could make it save distances too...?)
+with open('first_guess_surface.csv', 'wb') as csvfile:
+    writer = csv.writer(csvfile)
+    for i in range(len(elevations)):
+    	writer.writerow([elevations[i]])
 
