@@ -124,21 +124,27 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
-f = open ('beddata.txt', 'r')
-b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m
-f.close()
 
-run1 = isothermalISM(55, 1000, 0.0002, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
-run1.openOutput('run1.nc')
 
-for i in range(5000): #5000 years
-    run1.timestep(1)
-    if(i%100==0): 
-        print ('on timestep', i)
-        run1.write()
-#run1.calculate_velocity()   
-run1.close()
+def main():
+    f = open ('beddata.txt', 'r')
+    b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m 
+    f.close()
 
-plot_model_run('run1.nc')
+    run1 = isothermalISM(55, 1000, 0.0002, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
+    run1.openOutput('run1.nc')
+
+    for i in range(5000): #5000 years
+        run1.timestep(1)
+        if(i%100==0): 
+            print ('on timestep', i)
+            run1.write()
+    #run1.calculate_velocity()   
+    run1.close()
+
+    plot_model_run('run1.nc')
+
+if __name__=='__main__':
+    main()
 
 

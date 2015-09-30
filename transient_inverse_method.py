@@ -2,7 +2,6 @@
 
 import numpy as np
 import basic_model
-
 def compare_bedrock(b0, b): #sums up the difference between each point to get a total difference
 	difference = 0
 	for i in range(len(b)):
@@ -14,7 +13,6 @@ f = open ('beddata.txt', 'r')
 b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m
 f.close()
 b = np.zeros(len(b0)) #initializing it to all zeros so difference will be greater than delta, so it won't just skip the model part entirely.
-print b
 s = np.zeros(len(b0))#figure out some way to more or less guess at entire surface topography.
 
 #TODO
@@ -39,18 +37,17 @@ for line in f.readlines():
     observed_surface.append(float(data[1]))
 f.close()
 
-print(observed_surface)
-
 while(compare_bedrock(b0, b) > 10): #i have no idea about this parameter i'm just screwing around
 	#solve forward problem
-	run = isothermalISM(55, 1000, 0.0002, 'run1.nc', b0) 
+	run = basic_model.isothermalISM(55, 1000, 0.0002, b0[:]) 
 	for i in range(5000): #5000 years
-    		run.timestep(1, mbal)
+    		run.timestep(1)
     	if(i%100==0): 
         	print ('on timestep', i)
 	h = run.get_ice_thickness()
+	
 	#superimpose bedrock calculated from surface on bedrock now
-
+	
 
 	#set bedrock to surface - height
 
