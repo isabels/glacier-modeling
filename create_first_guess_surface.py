@@ -55,9 +55,9 @@ elevations[12] = 600
 # mp.plot(x_distances, elevations, 'blue')
 # mp.show()
 
-#save to ANOTHER CSV! (for now just saving elevations. could make it save distances too...?)
+#save to ANOTHER CSV! 
 with open('first_guess_surface.csv', 'wb') as csvfile:
     writer = csv.writer(csvfile)
     for i in range(len(elevations)):
-    	writer.writerow([elevations[i]])
+    	writer.writerow([x_distances[i], elevations[i]])
 
