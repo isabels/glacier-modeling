@@ -2,6 +2,8 @@
 
 import numpy as np
 import basic_model
+import tools
+
 def compare_bedrock(b0, b): #sums up the difference between each point to get a total difference
 	difference = 0
 	for i in range(len(b)):
@@ -10,10 +12,10 @@ def compare_bedrock(b0, b): #sums up the difference between each point to get a 
 
 #using JamesO's bedrock guess as the initial bedrock topography. This may be a bad call since I tuned the model to it, but we'll see.
 f = open ('beddata.txt', 'r')
-b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m
+b = [float(line) for line in f.readlines()] #topmost point is at 1250 m
 f.close()
-b = np.zeros(len(b0)) #initializing it to all zeros so difference will be greater than delta, so it won't just skip the model part entirely.
-s = np.zeros(len(b0))#figure out some way to more or less guess at entire surface topography.
+b0 = np.zeros(len(b)) #initializing it to all zeros so difference will be greater than delta, so it won't just skip the model part entirely.
+s = np.zeros(len(b))#figure out some way to more or less guess at entire surface topography.
 
 #TODO
 #X create observed surface file w/ height at each node.
@@ -37,18 +39,33 @@ for line in f.readlines():
     observed_surface.append(float(data[1]))
 f.close()
 
-while(compare_bedrock(b0, b) > 10): #i have no idea about this parameter i'm just screwing around
+relaxation = 1 #value from paper
+regularization = 100 #value from paper. adjust?
+
+iterations = 0 #to keep track of about how long it runs
+
+while(compare_bedrock(b0, b) > 100): #i have no idea about this parameter i'm just screwing around
+	iterations += 1
+
 	#solve forward problem
+	b0 = b[:]
 	run = basic_model.isothermalISM(55, 1000, 0.0002, b0[:]) 
 	for i in range(5000): #5000 years
     		run.timestep(1)
     	if(i%100==0): 
         	print ('on timestep', i)
 	h = run.get_ice_thickness()
-	
+
 	#superimpose bedrock calculated from surface on bedrock now
-	
+	delta_h = tools.calculate_slopes(h, 1000) 
+	for i in range(len(h)):
+		h = h + relaxation*(b0[i] + h[i] - observed_surface[i]) + regularizaton*relaxation*delta_h[i] #what is this last part, i don't even know
 
 	#set bedrock to surface - height
+	for i in range(len(b)):
+		b[i] = observed_surface[i] - h[i]
+	
+print b
+
 
 
