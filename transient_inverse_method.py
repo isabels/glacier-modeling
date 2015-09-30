@@ -25,6 +25,7 @@ s = np.zeros(len(b0))#figure out some way to more or less guess at entire surfac
 #maaaaaaaybe pester allen?
 #maaaaaaaaybe ask kiya for DEM?
 #actually implement the rest of this
+#ALSO ALSO ALSO try running the model w/ full number of nodes (dunno what to do about bedtopo though)
 
 while(compare_bedrock(b0, b) > 10): #i have no idea about this parameter i'm just screwing around
 	#solve forward problem
