@@ -55,16 +55,18 @@ while(compare_bedrock(b0, b) > 100): #i have no idea about this parameter i'm ju
     	if(i%100==0): 
         	print ('on timestep', i)
 	h = run.get_ice_thickness()
+	h = h[0:55] #remove extra part of model (move to w/in model thing?)
 
 	#superimpose bedrock calculated from surface on bedrock now
-	delta_h = tools.calculate_slopes(h, 1000) 
+	delta_h = tools.calculate_slopes(h, 1000)
+	print len(h), len(delta_h), len(observed_surface), len(b0)
 	for i in range(len(h)):
-		h = h + relaxation*(b0[i] + h[i] - observed_surface[i]) + regularizaton*relaxation*delta_h[i] #what is this last part, i don't even know
+		h[i] = h[i] + relaxation*(b0[i] + h[i] - observed_surface[i]) + regularization*relaxation*delta_h[i] #what is this last part, i don't even know
 
 	#set bedrock to surface - height
 	for i in range(len(b)):
 		b[i] = observed_surface[i] - h[i]
-	
+
 print b
 
 
