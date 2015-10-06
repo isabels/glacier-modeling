@@ -112,7 +112,7 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
-run1 = isothermalISM(55, 1000, 0.0002, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
+run1 = isothermalISM(550, 100, 0.0002, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
 
 f = open('TAKU_MBAL_DATA.csv', 'r')
 mbal=[]
@@ -126,7 +126,7 @@ for line in f.readlines():
 for i in range(20): #stupid hack to deal with continuation past divide
     mbal.append(7)
 
-for i in range(5000): #5000 years
+for i in range(1000): #5000 years
     run1.timestep(1, mbal)
     if(i%100==0): 
         print ('on timestep', i)
