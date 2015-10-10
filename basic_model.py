@@ -10,7 +10,7 @@ import matplotlib.pyplot as mp
 class isothermalISM(object):
     p = 918 #density of ice
     g = 9.81 #gravitational constant
-    glenns_a = 3.4e-18 #glenn's flow law constant, should be 1e-16
+    glenns_a = 2.4e-24 #glenn's flow law constant, should be 2.4e-24 for temperate (0degC) ice 
     glenns_n = 3 #power of glenn's flow law
     
     def __init__(self,num_nodes,dx,slide_parameter, fname): #initializes the model's fields
@@ -112,7 +112,7 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
-run1 = isothermalISM(55, 1000, 0.0002, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
+run1 = isothermalISM(55, 1000, 0.0005, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
 
 f = open('TAKU_MBAL_DATA.csv', 'r')
 mbal=[]
@@ -129,7 +129,7 @@ for i in range(20): #stupid hack to deal with continuation past divide
 for i in range(5000): #5000 years
     run1.timestep(1, mbal)
     if(i%100==0): 
-        print ('on timestep', i)
+        print 'on timestep', i
         run1.write()
 #run1.calculate_velocity()   
 run1.close()
