@@ -6,10 +6,10 @@ import tools
 import matplotlib.pyplot as mp
 import scipy.ndimage.filters as sp
 
-def compare_bedrock(b0, b): #sums up the difference between each point to get a total difference
+def compare_bedrock(b0, b): #sums up the squared difference between each point to get a total difference
 	difference = 0
 	for i in range(len(b)):
-		difference += abs(b[i]-b0[i])
+		difference += (b[i]-b0[i])**2
 	return difference
 
 #using JamesO's bedrock guess as the initial bedrock topography. This may be a bad call since I tuned the model to it, but we'll see.
