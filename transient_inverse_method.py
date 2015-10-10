@@ -4,6 +4,7 @@ import numpy as np
 import basic_model
 import tools
 import matplotlib.pyplot as mp
+import scipy.ndimage.filters as sp
 
 def compare_bedrock(b0, b): #sums up the difference between each point to get a total difference
 	difference = 0
@@ -57,8 +58,8 @@ while(compare_bedrock(b0, b) > 550): #i have no idea about this parameter i'm ju
 	h = h[0:55] #remove extra part of model (move to w/in model thing?)
 
 	#superimpose bedrock calculated from surface on bedrock now
-	delta_h = tools.calculate_slopes(h, 1000)
-	print len(h), len(delta_h), len(observed_surface), len(b0)
+	delta_h = np.zeros(len(h))
+	sp.laplace(h, delta_h) #i have no idea if this is an appropriate thing to do to calculate laplacian term
 	for i in range(len(h)):
 		h[i] = h[i] + relaxation*(b0[i] + h[i] - observed_surface[i]) #+ regularization*relaxation*delta_h[i] #what is this last part, i don't even know
 
