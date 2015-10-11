@@ -10,10 +10,11 @@ import matplotlib.pyplot as mp
 class isothermalISM(object):
     p = 918 #density of ice
     g = 9.81 #gravitational constant
-    glenns_a = 3.4e-18 #glenn's flow law constant, should be 1e-16
+    glenns_a = 2.4e-24 #glenn's flow law constant, should be 2.4e-24 for temperate (0degC) ice 
     glenns_n = 3 #power of glenn's flow law
+    nodes_past_divide = 20 #used to add things to mass balance
     
-    def __init__(self,num_nodes,dx,slide_parameter, fname): #initializes the model's fields
+    def __init__(self,num_nodes,dx,slide_parameter, b): #initializes the model's fields
         self.dx = dx 
         self.slide_parameter = slide_parameter 
         self.num_nodes = num_nodes + 20
@@ -22,15 +23,23 @@ class isothermalISM(object):
         self.x= np.array(range(0,(self.num_nodes*self.dx),self.dx)) 
         self.ice_thickness= np.zeros(self.num_nodes) 
         
-        infile = open ('beddata.txt', 'r')
-        numbers = [float(line) for line in infile.readlines()] #topmost point is at 1250 m
-        infile.close()
-        self.bed_elev = numbers #+ range(1240, 1040, 10) #sloping back down on far side of divide
+        self.bed_elev = b
         for i in range(1210, 410, -40):
             self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
-        self.openOutput(fname)
-        
+
+        f = open('TAKU_MBAL_DATA.csv', 'r')
+        mbal=[]
+        count = 0
+        for line in f.readlines():
+            count += 1
+            if(count%10==0):
+                data = line.split(',')
+                mbal.append(float(data[1]))
+        for i in range(20): #stupid hack to deal with continuation past divide
+            mbal.append(7)
+        self.mass_balance = mbal
+
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
         f = ncdf.netcdf_file(fname, 'w') 
@@ -53,7 +62,7 @@ class isothermalISM(object):
     def close(self): #closes the output file
         self.f.close()
         
-    def timestep(self,dt,mass_balance): #performs one timestep, i.e. calculates a new surface elev, thickness from prev one
+    def timestep(self,dt): #performs one timestep, i.e. calculates a new surface elev, thickness from prev one
         D = np.zeros(self.num_nodes)
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         for i in range(0,self.num_nodes):
@@ -72,7 +81,7 @@ class isothermalISM(object):
             A[i, i-1] = beta
             A[i, i] = 1 - alpha - beta
             A[i, i+1] = alpha
-            B[i] = (-alpha*self.surface_elev[i+1]) + ((1 + alpha + beta)*self.surface_elev[i]) - (beta*self.surface_elev[i-1]) + (mass_balance[i]*dt)
+            B[i] = (-alpha*self.surface_elev[i+1]) + ((1 + alpha + beta)*self.surface_elev[i]) - (beta*self.surface_elev[i-1]) + (self.mass_balance[i]*dt)
         
         self.surface_elev, info=linalg.bicgstab(A, B) 
         
@@ -88,6 +97,9 @@ class isothermalISM(object):
         for i in range(self.num_nodes):
             velocity[i] = ((-(2*self.glenns_a*(self.p*-9.81)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.slide_parameter*self.p*-9.81*self.ice_thickness[i]*slopes[i])
             print('velocity at node ', i, 'is: ', velocity[i])
+
+    def get_ice_thickness(self):
+        return self.ice_thickness
 
             
 
@@ -112,28 +124,22 @@ def plot_model_run(fname): #reads and plots data from the output file
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
-run1 = isothermalISM(550, 100, 0.0002, 'run1.nc') #55 nodes, 1000-meter spacing,  basal slip of zero
 
-f = open('TAKU_MBAL_DATA.csv', 'r')
-mbal=[]
-count = 0
-for line in f.readlines():
-    count += 1
-    if(count%10==0):
-        data = line.split(',')
-        mbal.append(float(data[1]))
+def main():
+    f = open ('beddata.txt', 'r')
+    b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m 
+    f.close()
+    run1 = isothermalISM(55, 1000, 0.0002, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
+    run1.openOutput('run1.nc')
+    for i in range(5000): #5000 years
+        run1.timestep(1)
+        if(i%100==0): 
+            print ('on timestep', i)
+            run1.write()
+    #run1.calculate_velocity()   
+    run1.close()
 
-for i in range(20): #stupid hack to deal with continuation past divide
-    mbal.append(7)
-
-for i in range(1000): #5000 years
-    run1.timestep(1, mbal)
-    if(i%100==0): 
-        print ('on timestep', i)
-        run1.write()
-#run1.calculate_velocity()   
-run1.close()
-
-plot_model_run('run1.nc')
+if __name__=='__main__':
+    main()
 
 
