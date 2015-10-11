@@ -25,6 +25,6 @@ print distance
 with open('surface_elevations.csv', 'wb') as csvfile:
     writer = csv.writer(csvfile)
     for i in range(len(elevation)):
-    	writer.writerow([distance[i], elevation[i]q])
+    	writer.writerow([distance[i], elevation[i]])
     
 
