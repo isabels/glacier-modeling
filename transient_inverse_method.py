@@ -38,7 +38,7 @@ for line in f.readlines():
 f.close()
 
 relaxation = 1 #value from paper
-regularization = 100 #value from paper. adjust?
+regularization = 1 #100 is value from paper. adjust?
 
 iterations = 0 #to keep track of about how long it runs
 
