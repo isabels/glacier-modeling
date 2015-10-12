@@ -7,3 +7,5 @@ def calculate_slopes(elev, dx):
 		slopes[i] = (elev[i+1]-elev[i-1])/(dx*2.0)
 	slopes[len(elev)-1] = (elev[len(elev)-1] - elev[len(elev)-2]) / dx
 	return slopes
+
+

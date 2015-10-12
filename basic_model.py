@@ -39,6 +39,7 @@ class isothermalISM(object):
         for i in range(20): #stupid hack to deal with continuation past divide
             mbal.append(7)
         self.mass_balance = mbal
+        # self.mass_balance = tools.load_mbal()
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
@@ -121,6 +122,7 @@ def plot_model_run(fname): #reads and plots data from the output file
         data = line.split(',')
         surf_dist.append(float(data[0]))
         surf_elev.append(float(data[1]))
+    # surf_dist, surf_elev = tools.load_gps_surface()
     mp.plot(surf_dist, surf_elev, 'red')
     mp.show()
 
@@ -129,6 +131,7 @@ def main():
     f = open ('beddata.txt', 'r')
     b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m 
     f.close()
+    # b0 = tools.load_bedtopo()
     run1 = isothermalISM(55, 1000, 0.0002, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('run1.nc')
     for i in range(5000): #5000 years
