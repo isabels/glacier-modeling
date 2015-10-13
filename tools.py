@@ -117,4 +117,14 @@ def create_first_guess_surface():
 		for i in range(len(elevations)):
 			writer.writerow([x_distances[i], elevations[i]])
 
+def create_known_bedrock():
+	#creates a csv of points that are actual seismic data
+	distances = np.zeros(6)
+	elevations = np.zeros(6)
+
+	with open('known_bedrock.csv', 'wb') as csvfile:
+		writer = csv.writer(csvfile)
+		for i in range(len(distances)):
+			writer.writerow([distances[i], elevations[i]])
+
 
