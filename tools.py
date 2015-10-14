@@ -43,6 +43,14 @@ def load_gps_surface():
 		surf_elev.append(float(data[1]))
 	return (surf_dist, surf_elev)
 
+def calculate_surface_difference(calc_surf, obs_surf):
+	diff = 0
+	calc_surf = calc_surf[0:55]
+	obs_surf = obs_surf[0:55]
+	for i in range(len(calc_surf)):
+		diff += (calc_surf[i] - obs_surf[i])**2
+	return math.sqrt(diff)
+
 def plot_model_run(fname): #reads and plots data from the output file
 	f = ncdf.netcdf_file(fname, 'r')
 	elev = f.variables['surface_elev'][:]
@@ -53,8 +61,10 @@ def plot_model_run(fname): #reads and plots data from the output file
 		mp.plot(x, bed[i], 'green')
 		mp.plot(x, elev[i], 'blue')
 	mp.plot(x, elev[len(time)-1], 'cyan')
-	surf_dist, surf_elev = load_gps_surface() #will this work? apparently so!
-	mp.plot(surf_dist, surf_elev, 'red')
+	surf_elev = load_first_guess_surface()
+	mp.plot(range(0, 55000, 1000), surf_elev, 'red')
+	diff = calculate_surface_difference(elev[len(time)-1], surf_elev)
+	mp.title(diff)
 	mp.show()
 
 def create_gps_elevation_points():
@@ -127,14 +137,20 @@ def load_nolan_bedrock(fulldata=False): #returns 550 nodes if fulldatda true, el
 			if(fulldata):
 				bed.append(row[1])
 			elif(count%10 == 0):
-				print row
 				bed.append(float(row[1]))
 			count += 1
-	print bed
-	print(len(bed))
 	bed = bed[0:55] #dumb hack because actual taku is like 57km and model is set up for 55. 
-	print len(bed)
 	return bed
+
+def load_first_guess_surface():
+	f = open('first_guess_surface.csv', 'r')
+	observed_surface=[]
+	for line in f.readlines():
+		data = line.split(',')
+		observed_surface.append(float(data[1]))
+	f.close()
+	return observed_surface
+
 
 	
 
