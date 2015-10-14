@@ -91,7 +91,7 @@ class isothermalISM(object):
         return self.ice_thickness
 
 def main():
-    b0 = tools.load_nolan_bedrock()
+    b0 = tools.load_bedtopo()
     run1 = isothermalISM(55, 1000, 0.0004, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('run1.nc')
 
