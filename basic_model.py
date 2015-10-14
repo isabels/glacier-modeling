@@ -10,7 +10,7 @@ import matplotlib.pyplot as mp
 class isothermalISM(object):
     p = 918 #density of ice
     g = 9.81 #gravitational constant
-    glenns_a = 3.4e-18 #glenn's flow law constant, should be 1e-16
+    glenns_a = 2.4e-24#3.4e-18 #glenn's flow law constant, should be 1e-16
     glenns_n = 3 #power of glenn's flow law
     nodes_past_divide = 20 #used to add things to mass balance
     
@@ -131,7 +131,7 @@ def main():
     b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m 
     f.close()
 
-    run1 = isothermalISM(55, 1000, 0.0002, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
+    run1 = isothermalISM(55, 1000, 0.0004, b0) #slip was .0002 #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('run1.nc')
 
     for i in range(5000): #5000 years
