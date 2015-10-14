@@ -117,14 +117,25 @@ def create_first_guess_surface():
 		for i in range(len(elevations)):
 			writer.writerow([x_distances[i], elevations[i]])
 
-def create_known_bedrock():
-	#creates a csv of points that are actual seismic data
-	distances = np.zeros(6)
-	elevations = np.zeros(6)
+def load_nolan_bedrock(fulldata=False): #returns 550 nodes if fulldatda true, else 55 for testing
+	#loads the bedrock data file that is just seismic data + linear interpolations
+	bed = []
+	count = 0
+	with open('nolan_1995_bed_topo.csv', 'rU') as csvfile:
+		reader = csv.reader(csvfile, dialect='excel')
+		for row in reader:
+			if(fulldata):
+				bed.append(row[1])
+			elif(count%10 == 0):
+				print row
+				bed.append(float(row[1]))
+			count += 1
+	print bed
+	print(len(bed))
+	bed = bed[0:55] #dumb hack because actual taku is like 57km and model is set up for 55. 
+	print len(bed)
+	return bed
 
-	with open('known_bedrock.csv', 'wb') as csvfile:
-		writer = csv.writer(csvfile)
-		for i in range(len(distances)):
-			writer.writerow([distances[i], elevations[i]])
+	
 
 
