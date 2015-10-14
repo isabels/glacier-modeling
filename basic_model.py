@@ -27,19 +27,7 @@ class isothermalISM(object):
         for i in range(1210, 410, -40):
             self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
-
-        f = open('TAKU_MBAL_DATA.csv', 'r')
-        mbal=[]
-        count = 0
-        for line in f.readlines():
-            count += 1
-            if(count%10==0):
-                data = line.split(',')
-                mbal.append(float(data[1]))
-        for i in range(20): #stupid hack to deal with continuation past divide
-            mbal.append(7)
-        self.mass_balance = mbal
-        # self.mass_balance = tools.load_mbal()
+        self.mass_balance = tools.load_mbal()
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
@@ -102,45 +90,18 @@ class isothermalISM(object):
     def get_ice_thickness(self):
         return self.ice_thickness
 
-            
-
-def plot_model_run(fname): #reads and plots data from the output file
-    f = ncdf.netcdf_file(fname, 'r')
-    elev = f.variables['surface_elev'][:]
-    bed = f.variables['bed_elev'][:]
-    time = f.variables['time'][:]
-    x = f.variables['x'][:]
-    for i in range (len(time) - 1):
-        mp.plot(x, bed[i], 'green')
-        mp.plot(x, elev[i], 'blue')
-    mp.plot(x, elev[len(time)-1], 'cyan')
-    f.close()
-    surf_dist = []
-    surf_elev = []
-    elev_data = open('surface_elevations.csv', 'r')
-    for line in elev_data.readlines():
-        data = line.split(',')
-        surf_dist.append(float(data[0]))
-        surf_elev.append(float(data[1]))
-    # surf_dist, surf_elev = tools.load_gps_surface()
-    mp.plot(surf_dist, surf_elev, 'red')
-    mp.show()
-
-
 def main():
-    f = open ('beddata.txt', 'r')
-    b0 = [float(line) for line in f.readlines()] #topmost point is at 1250 m 
-    f.close()
-    # b0 = tools.load_bedtopo()
-    run1 = isothermalISM(55, 1000, 0.0002, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
+    b0 = tools.load_nolan_bedrock()
+    run1 = isothermalISM(55, 1000, 0.0005, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('run1.nc')
     for i in range(5000): #5000 years
         run1.timestep(1)
         if(i%100==0): 
-            print ('on timestep', i)
+            print 'on timestep', i
             run1.write()
     #run1.calculate_velocity()   
     run1.close()
+    tools.plot_model_run('run1.nc')
 
 if __name__=='__main__':
     main()
