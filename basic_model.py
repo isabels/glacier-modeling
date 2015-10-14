@@ -28,6 +28,7 @@ class isothermalISM(object):
             self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
         self.mass_balance = tools.load_mbal()
+        print(self.mass_balance)
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
