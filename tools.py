@@ -13,16 +13,19 @@ def calculate_slopes(elev, dx):
 	slopes[len(elev)-1] = (elev[len(elev)-1] - elev[len(elev)-2]) / dx
 	return slopes
 
-def load_mbal():
+def load_mbal(fulldata=False):
 	#includes points past divide
-	f = open('TAKU_MBAL_DATA.csv', 'r')
 	mbal=[]
 	count = 0
-	for line in f.readlines():
-		count += 1
-		if(count%10==0):
-			data = line.split(',')
-			mbal.append(float(data[1]))
+
+	with open('TAKU_MBAL_DATA.csv', 'rU') as csvfile:
+		reader = csv.reader(csvfile, dialect='excel')
+		for row in reader:
+			if(fulldata):
+				mbal.append(float(row[1]))
+			elif(count%10 == 0):
+				mbal.append(float(row[1]))
+			count += 1
 	for i in range(20): #stupid hack to deal with continuation past divide
 		mbal.append(7)
 	return mbal
@@ -95,8 +98,8 @@ def create_first_guess_surface():
 	surf_dist, surf_elev = load_gps_surface()
 	#the goal is to fill in the nodes with elev values. 
 	#algorithm is to find two gps points on either side of each node, then linearly interpolate
-	x_distances = range(0, 55000, 1000)
-	elevations = np.zeros(55)
+	x_distances = range(0, 57000, 1000)
+	elevations = np.zeros(57)
 	index = 0 #keeps track of where we are in gps data array
 	for i in range(len(elevations)):
 		current_dist = x_distances[i]
@@ -139,7 +142,6 @@ def load_nolan_bedrock(fulldata=False): #returns 550 nodes if fulldatda true, el
 			elif(count%10 == 0):
 				bed.append(float(row[1]))
 			count += 1
-	bed = bed[0:55] #dumb hack because actual taku is like 57km and model is set up for 55. 
 	return bed
 
 def load_first_guess_surface():
