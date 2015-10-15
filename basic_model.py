@@ -12,22 +12,28 @@ class isothermalISM(object):
     g = 9.81 #gravitational constant
     glenns_a = 2.4e-24 #glenn's flow law constant, should be 2.4e-24 for temperate (0degC) ice 
     glenns_n = 3 #power of glenn's flow law
-    nodes_past_divide = 20 #used to add things to mass balance
+    nodes_past_divide = 200 #used to add things to mass balance
     
     def __init__(self,num_nodes,dx,slide_parameter, b): #initializes the model's fields
         self.dx = dx 
         self.slide_parameter = slide_parameter 
-        self.num_nodes = num_nodes + 20
+        self.num_nodes = num_nodes + nodes_past_divide
 
         self.time = 0 
         self.x= np.array(range(0,(self.num_nodes*self.dx),self.dx)) 
         self.ice_thickness= np.zeros(self.num_nodes) 
         
         self.bed_elev = b
-        for i in range(1210, 410, -40):
+        for i in range(1250, 410, -4):
             self.bed_elev.append(i)
+        print 'bed elev length after past divide', len(self.bed_elev)
         self.surface_elev= self.bed_elev #start with no ice
-        self.mass_balance = tools.load_mbal()
+        self.mass_balance = tools.load_mbal(fulldata=True)
+        print 'x', len(self.x)
+        print 'thickness', len(self.ice_thickness)
+        print 'bed', len(self.bed_elev)
+        print 'surf', len(self.surface_elev)
+        print 'mbal', len(self.mass_balance)
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
@@ -91,8 +97,8 @@ class isothermalISM(object):
         return self.ice_thickness
 
 def main():
-    b0 = tools.load_nolan_bedrock()
-    run1 = isothermalISM(55, 1000, 0.0005, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
+    b0 = tools.load_nolan_bedrock(fulldata=True)
+    run1 = isothermalISM(570, 100, 0.0005, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('run1.nc')
     for i in range(5000): #5000 years
         run1.timestep(1)

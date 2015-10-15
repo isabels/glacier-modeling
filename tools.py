@@ -13,17 +13,20 @@ def calculate_slopes(elev, dx):
 	slopes[len(elev)-1] = (elev[len(elev)-1] - elev[len(elev)-2]) / dx
 	return slopes
 
-def load_mbal():
+def load_mbal(fulldata=False):
 	#includes points past divide
 	f = open('TAKU_MBAL_DATA.csv', 'r')
 	mbal=[]
 	count = 0
 	for line in f.readlines():
 		count += 1
-		if(count%10==0):
+		if(fulldata):
 			data = line.split(',')
 			mbal.append(float(data[1]))
-	for i in range(20): #stupid hack to deal with continuation past divide
+		elif(count%10==0):
+			data = line.split(',')
+			mbal.append(float(data[1]))
+	for i in range(200): #200 because it's full model#stupid hack to deal with continuation past divide
 		mbal.append(7)
 	return mbal
 
@@ -135,11 +138,12 @@ def load_nolan_bedrock(fulldata=False): #returns 550 nodes if fulldatda true, el
 		reader = csv.reader(csvfile, dialect='excel')
 		for row in reader:
 			if(fulldata):
-				bed.append(row[1])
+				bed.append(float(row[1]))
 			elif(count%10 == 0):
 				bed.append(float(row[1]))
 			count += 1
-	bed = bed[0:55] #dumb hack because actual taku is like 57km and model is set up for 55. 
+	#bed = bed[0:55] #dumb hack because actual taku is like 57km and model is set up for 55.
+	#bed = bed[0:550] 
 	return bed
 
 def load_first_guess_surface():
