@@ -149,7 +149,7 @@ def load_first_guess_surface():
 	with open('first_guess_surface.csv', 'rU') as csvfile:
 		reader = csv.reader(csvfile, dialect='excel')
 		for row in reader:
-			observed_surface.append(float(data[1]))
+			observed_surface.append(float(row[1]))
 	return observed_surface
 
 
