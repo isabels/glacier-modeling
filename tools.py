@@ -145,13 +145,13 @@ def load_nolan_bedrock(fulldata=False): #returns 550 nodes if fulldatda true, el
 	return bed
 
 def load_first_guess_surface():
-	f = open('first_guess_surface.csv', 'r')
-	observed_surface=[]
-	for line in f.readlines():
-		data = line.split(',')
-		observed_surface.append(float(data[1]))
-	f.close()
+	observed_surface = []
+	with open('first_guess_surface.csv', 'rU') as csvfile:
+		reader = csv.reader(csvfile, dialect='excel')
+		for row in reader:
+			observed_surface.append(float(data[1]))
 	return observed_surface
+
 
 
 	
