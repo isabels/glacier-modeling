@@ -17,14 +17,14 @@ class isothermalISM(object):
     def __init__(self,num_nodes,dx,slide_parameter, b): #initializes the model's fields
         self.dx = dx 
         self.slide_parameter = slide_parameter 
-        self.num_nodes = num_nodes + nodes_past_divide
+        self.num_nodes = num_nodes + self.nodes_past_divide
 
         self.time = 0 
         self.x= np.array(range(0,(self.num_nodes*self.dx),self.dx)) 
         self.ice_thickness= np.zeros(self.num_nodes) 
         
         self.bed_elev = b
-        for i in range(1250, 410, -4):
+        for i in range(1249, 1050, -1):
             self.bed_elev.append(i)
         print 'bed elev length after past divide', len(self.bed_elev)
         self.surface_elev= self.bed_elev #start with no ice

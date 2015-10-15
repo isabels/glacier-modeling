@@ -15,18 +15,32 @@ def calculate_slopes(elev, dx):
 
 def load_mbal(fulldata=False):
 	#includes points past divide
-	f = open('TAKU_MBAL_DATA.csv', 'r')
-	mbal=[]
+	# f = open('TAKU_MBAL_DATA.csv', 'r')
+	# mbal=[]
+	# count = 0
+	# for line in f.readlines():
+	# 	count += 1
+	# 	if(fulldata):
+	# 		data = line.split(',')
+	# 		mbal.append(float(data[1]))
+	# 	elif(count%10==0):
+	# 		data = line.split(',')
+	# 		mbal.append(float(data[1]))
+	# for i in range(200): #200 because it's full model#stupid hack to deal with continuation past divide
+	# 	mbal.append(7)
+	# return mbal
+
+	mbal= []
 	count = 0
-	for line in f.readlines():
-		count += 1
-		if(fulldata):
-			data = line.split(',')
-			mbal.append(float(data[1]))
-		elif(count%10==0):
-			data = line.split(',')
-			mbal.append(float(data[1]))
-	for i in range(200): #200 because it's full model#stupid hack to deal with continuation past divide
+	with open('TAKU_MBAL_DATA.csv', 'rU') as csvfile:
+		reader = csv.reader(csvfile, dialect='excel')
+		for row in reader:
+			if(fulldata):
+				mbal.append(float(row[1]))
+			elif(count%10 == 0):
+				mbal.append(float(row[1]))
+			count += 1
+	for i in range(200):
 		mbal.append(7)
 	return mbal
 
