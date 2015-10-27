@@ -13,12 +13,12 @@ def calculate_slopes(elev, dx):
 	slopes[len(elev)-1] = (elev[len(elev)-1] - elev[len(elev)-2]) / dx
 	return slopes
 
-def load_mbal(fulldata=False):
+def load_mbal(filename, fulldata=False):
 	#includes points past divide
 	mbal=[]
 	count = 0
 
-	with open('TAKU_MBAL_DATA.csv', 'rU') as csvfile:
+	with open(filename, 'rU') as csvfile:
 		reader = csv.reader(csvfile, dialect='excel')
 		for row in reader:
 			if(fulldata):
@@ -65,7 +65,7 @@ def plot_model_run(fname): #reads and plots data from the output file
 		mp.plot(x, elev[i], 'blue')
 	mp.plot(x, elev[len(time)-1], 'cyan')
 	surf_elev = load_first_guess_surface()
-	mp.plot(range(0, 55000, 1000), surf_elev, 'red')
+	mp.plot(range(0, 57000, 1000), surf_elev, 'red')
 	diff = calculate_surface_difference(elev[len(time)-1], surf_elev)
 	mp.title(diff)
 	mp.show()

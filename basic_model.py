@@ -27,7 +27,7 @@ class isothermalISM(object):
         for i in range(1210, 410, -40):
             self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
-        self.mass_balance = tools.load_mbal()
+        self.mass_balance = tools.load_mbal('mbal_with_holeinwall.csv')
         print 'mbal', len(self.mass_balance)
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
