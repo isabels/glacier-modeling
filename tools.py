@@ -65,7 +65,7 @@ def plot_model_run(fname): #reads and plots data from the output file
 		mp.plot(x, elev[i], 'blue')
 	mp.plot(x, elev[len(time)-1], 'cyan')
 	surf_elev = load_first_guess_surface()
-	mp.plot(range(0, 55000, 1000), surf_elev, 'red')
+	mp.plot(range(0, 57000, 1000), surf_elev, 'red')
 	diff = calculate_surface_difference(elev[len(time)-1], surf_elev)
 	mp.title(diff)
 	mp.show()
