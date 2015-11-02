@@ -31,9 +31,12 @@ def load_mbal(fulldata=False):
 	return mbal
 
 def load_bedtopo():
-	f = open ('beddata.txt', 'r')
-	bed = [float(line) for line in f.readlines()] #topmost point is at 1250 m 
-	f.close()
+	bed = []
+	with open('beddata.csv', 'rU') as csvfile:
+		reader = csv.reader(csvfile, dialect='excel')
+		for row in reader:
+			bed.append(float(row[0]))
+	csvfile.close()
 	return bed
 
 def load_gps_surface():

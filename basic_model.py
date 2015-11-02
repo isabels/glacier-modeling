@@ -92,9 +92,9 @@ class isothermalISM(object):
         return self.ice_thickness
 
 def main():
-    b0 = tools.load_nolan_bedrock()
+    b0 = tools.load_bedtopo()
     run1 = isothermalISM(58, 1000, 0.0005, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
-    run1.openOutput('run1.nc')
+    run1.openOutput('random_bed.nc')
 
     for i in range(5000): #5000 years
         run1.timestep(1)
@@ -103,7 +103,7 @@ def main():
             run1.write()
     #run1.calculate_velocity()   
     run1.close()
-    tools.plot_model_run('run1.nc')
+    tools.plot_model_run('random_bed.nc')
 
 if __name__=='__main__':
     main()
