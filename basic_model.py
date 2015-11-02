@@ -20,7 +20,7 @@ class isothermalISM(object):
         self.num_nodes = num_nodes + self.nodes_past_divide
 
         self.time = 0 
-        self.x= np.array(range(0,(self.num_nodes*self.dx),self.dx)) 
+        self.x= np.array(range(0,((self.num_nodes)*self.dx),self.dx)) 
         self.ice_thickness= np.zeros(self.num_nodes) 
         
         self.bed_elev = b
@@ -28,11 +28,7 @@ class isothermalISM(object):
             self.bed_elev.append(i)
         print 'bed elev length after past divide', len(self.bed_elev)
         self.surface_elev= self.bed_elev #start with no ice
-        self.mass_balance = tools.load_mbal(fulldata=True)
-        print 'x', len(self.x)
-        print 'thickness', len(self.ice_thickness)
-        print 'bed', len(self.bed_elev)
-        print 'surf', len(self.surface_elev)
+        self.mass_balance = tools.load_mbal('reduced_tributary_mbal.csv', fulldata=True)
         print 'mbal', len(self.mass_balance)
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
@@ -96,13 +92,16 @@ class isothermalISM(object):
     def get_ice_thickness(self):
         return self.ice_thickness
 
+    def get_surface_elev(self):
+        return self.surface_elev
+
 def main():
     b0 = tools.load_nolan_bedrock(fulldata=True)
-    run1 = isothermalISM(570, 100, 0.0005, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
+    run1 = isothermalISM(580, 100, 0.00075, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('run1.nc')
     for i in range(5000): #5000 years
         run1.timestep(1)
-        if(i%100==0): 
+        if(i%10==0): 
             print 'on timestep', i
             run1.write()
     #run1.calculate_velocity()   
