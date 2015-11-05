@@ -20,19 +20,20 @@ def constrain_to_reality(bed_elev, nolan_elev):
 			return float("inf")
 	return 0
 
+
 #function to evaluate fitness of the bed, returns number which is fitness, lower is better
-def evaluate_bed(bed_elev, surf_elev, nolan_elev):
-	return constrain_to_reality(bed_elev, nolan_elev)
+def evaluate_bed(bed_elev, surf_elev, nolan_elev, gps_elev):
+	return constrain_to_reality(bed_elev, nolan_elev) + constrain_to_nolan(bed_elev) + tools.calculate_surface_difference(surf_elev, gps_elev)
 	#constrain to realistic data (no huge spikes)
 	#constrain to reality via not more than 500 from bedtopo? (or is this more or less included in the other ones)
 
 def main():
 	bed = tools.load_nolan_bedrock()
+	gps_surf = tools.load_first_guess_surface()
 	run = basic_model.isothermalISM(58, 1000, .0015,.0005,.00022, bed[:])
 	for n in range(1000):
 		run.timestep(1)
-	print evaluate_bed(bed, run.get_surface_elev(), bed)
-	print evaluate_bed(run.get_surface_elev(), bed, bed)
+	print evaluate_bed(bed, run.get_surface_elev(), bed, gps_surf)
 
 
 if __name__=='__main__':

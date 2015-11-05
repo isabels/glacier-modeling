@@ -48,7 +48,7 @@ def load_gps_surface():
 
 def calculate_surface_difference(calc_surf, obs_surf):
 	diff = 0
-	calc_surf = calc_surf[0:57]
+	calc_surf = calc_surf[0:57] #ugh this is so dumb but whatever
 	#obs_surf = obs_surf[0:55]
 	for i in range(len(calc_surf)):
 		diff += (calc_surf[i] - obs_surf[i])**2
