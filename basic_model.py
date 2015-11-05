@@ -27,9 +27,9 @@ class isothermalISM(object):
         self.ice_thickness= np.zeros(self.num_nodes) 
         
         self.bed_elev = b
-        for i in range(1249, 1050, -1):
+        print len(self.bed_elev)
+        for i in range(1249, 1049, -1):
             self.bed_elev.append(i)
-        print 'bed elev length after past divide', len(self.bed_elev)
         self.surface_elev= self.bed_elev #start with no ice
         self.mass_balance = tools.load_mbal('reduced_smoothed_mbal.csv', fulldata=True)
 
@@ -59,9 +59,9 @@ class isothermalISM(object):
         D = np.zeros(self.num_nodes)
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         for i in range(0,self.num_nodes):
-            if(i<20):
+            if(i<200):
                 D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_1*self.p*self.g*(self.ice_thickness[i]**2))
-            elif(i<40):
+            elif(i<400):
                 D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_2*self.p*self.g*(self.ice_thickness[i]**2))
             else:
                 D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_3*self.p*self.g*(self.ice_thickness[i]**2))
@@ -105,7 +105,7 @@ class isothermalISM(object):
 def main():
     b0 = tools.load_nolan_bedrock(fulldata=True)
     start = time.time()
-    run1 = isothermalISM(580, 100, 0.0015, .0005, 0.00022, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
+    run1 = isothermalISM(571, 100, 0.0015, .0005, 0.00022, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
     run1.openOutput('run1.nc')
     for i in range(5000): #5000 years
         run1.timestep(1)

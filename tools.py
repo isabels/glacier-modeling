@@ -142,11 +142,6 @@ def load_nolan_bedrock(fulldata=False): #returns 550 nodes if fulldatda true, el
 			elif(count%10 == 0):
 				bed.append(float(row[1]))
 			count += 1
-<<<<<<< HEAD
-	#bed = bed[0:55] #dumb hack because actual taku is like 57km and model is set up for 55.
-	#bed = bed[0:550] 
-=======
->>>>>>> master
 	return bed
 
 def load_first_guess_surface():
