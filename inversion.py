@@ -27,6 +27,11 @@ def evaluate_bed(bed_elev, surf_elev, nolan_elev, gps_elev):
 	#constrain to realistic data (no huge spikes)
 	#constrain to reality via not more than 500 from bedtopo? (or is this more or less included in the other ones)
 
+# CONSTRUCT BED: given tuple of variables, constructs a bed
+# RUN MODEL: runs model on constructed bed. this plus construct bed give what ya need for the evaluating
+
+#
+
 def main():
 	bed = tools.load_nolan_bedrock()
 	gps_surf = tools.load_first_guess_surface()
