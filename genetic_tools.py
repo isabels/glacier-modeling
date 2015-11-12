@@ -31,9 +31,5 @@ def create(length, poss_range):
 		temp.append(random.randint(0, poss_range-1))
 	return tuple(temp)
 
-def generate_bed(parameters):
-	return tools.load_nolan_bedrock() #lol you wish it was this easy
-	#DOES THE THING
-	#THE THING THAT IS HARD
-	#THE THING I DON'T KNOW HOW TO DO
-	#SO I'M NOT GOING TO WRITE THIS FUNCTION YET LOL
+
+
