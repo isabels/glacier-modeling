@@ -3,6 +3,7 @@ import random
 import genetic_tools as gt
 import basic_model
 import evaluate
+import generate_bed as bed
 
 class Population(object):
 
@@ -11,12 +12,15 @@ class Population(object):
 		def __init__(self, parameters):
 			self.parameters = parameters
 
+		def to_string(self):
+			print self.parameters, self.fitness
+
 	def __init__(self, size, length, param_range, fitness_function):
 		self.n = size
 		self.individuals = np.empty(size, dtype=object)
 		self.param_range = param_range
 		for i in range(size):
-			self.individuals[i] = self.Individual((1,2,3,4,5))#gt.create(length, param_range))
+			self.individuals[i] = self.Individual(gt.create(size, param_range))#gt.create(length, param_range))
 		self.mutation_rate = 1.0/length
 		self. pool_size = 10
 		self.fitness_function = fitness_function
@@ -24,8 +28,7 @@ class Population(object):
 	def best_fitness(self):
 		best = float("inf")
 		for i in range(self.n):
-			current = self.fitness_function.evaluate_bed(self.individuals[i].bed, self.individuals[i].surface)
-			if(current < best):
+			if(self.individuals[i].fitness < best):
 				best = current
 		return best
 
@@ -34,8 +37,7 @@ class Population(object):
 		best_index = -1
 		for i in range(self.pool_size):
 			index = random.randint(0, self.n-1)
-			current = self.fitness_function.evaluate_bed(self.individuals[index].bed, self.individuals[index].surface)
-			if(current > best):
+			if(self.individuals[index].fitness < best):
 				best = current
 				best_index = index
 		return(self.individuals[best_index])
@@ -51,20 +53,21 @@ class Population(object):
 
 	def run_models(self):
 		for i in range(self.n):
-			self.individuals[i].bed = gt.generate_bed(self.individuals[i].parameters)
+			self.individuals[i].bed = bed.generate_bed(self.individuals[i].parameters)
 			run = basic_model.isothermalISM(58, 1000, .0015, .0005, .00022, self.individuals[i].bed[:])
 			for j in range(2000):
 				run.timestep(1)
 			self.individuals[i].surface = run.get_surface_elev()
+			self.individuals[i].fitness = self.fitness_function.evaluate_bed(self.individuals[i].bed, self.individuals[i].surface)
 
 
 def main():
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(2, 5, 10, fitness_function)
+	population = Population(500, 2, 20, fitness_function)
 	population.run_models()
 	population.evolve()
 	population.run_models()
-	print population.best_fitness()
+	print [item.to_string() for item in population.individuals]
 
 
 

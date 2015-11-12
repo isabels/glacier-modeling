@@ -15,16 +15,16 @@ class FitnessFunction(object):
 		error = 50 #a rough average between the 30 for one reading and the 150 for the other. Welp.
 		for node,val in zip(nodes_to_check, expected_values):
 			if (bed_elev[node] > val + error) or (bed_elev[node] < val - error):
-				return penalty
+				return self.penalty
 		return 0
 
 	def constrain_to_reality(self,bed_elev):
 		error = 500 #who knows. this is to prevent things from getting wildly out of hand w/o constraining too tightly to first guess.
 		for i in range(len(bed_elev)-1):
 			if(abs(bed_elev[i] - bed_elev[i+1]) > 150): #largest jump in basic bedtopo is about 80, so this might be reasonable?
-				return penalty
+				return self.penalty
 			if((bed_elev[i] > self.nolan_bed[i] + error) or (bed_elev[i] < self.nolan_bed[i] - error)):
-				return penalty
+				return self.penalty
 		return 0
 
 
