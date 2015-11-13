@@ -2,7 +2,7 @@ import numpy as np
 import random
 import genetic_tools as gt
 import basic_model
-import evaluate
+import evaluate_bed
 import generate_bed as bed
 import pickle
 
@@ -61,7 +61,7 @@ class Population(object):
 			for j in range(2000):
 				run.timestep(1)
 			self.individuals[i].surface = run.get_surface_elev()
-			self.individuals[i].fitness = self.fitness_function.evaluate_bed(self.individuals[i].bed, self.individuals[i].surface)
+			self.individuals[i].fitness = self.fitness_function.evaluate(self.individuals[i].bed, self.individuals[i].surface)
 			if(i%10==0):
 				print 'on individual', i, 'of', self.n
 
