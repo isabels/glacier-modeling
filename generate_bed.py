@@ -91,7 +91,7 @@ def topohandler(parameters):
 
 
 def main():
-	test = generate_bed((500, 5))
+	test = generate_bed((10, 5))
 	real = tools.load_nolan_bedrock()
 	print len(test)
 	print len(real)

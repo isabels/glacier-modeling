@@ -4,6 +4,7 @@ import genetic_tools as gt
 import basic_model
 import evaluate
 import generate_bed as bed
+import pickle
 
 class Population(object):
 
@@ -16,6 +17,7 @@ class Population(object):
 			print self.parameters, self.fitness
 
 	def __init__(self, size, length, param_range, fitness_function):
+		self.generation = 0
 		self.n = size
 		self.individuals = np.empty(size, dtype=object)
 		self.param_range = param_range
@@ -50,6 +52,7 @@ class Population(object):
 			child = gt.cross(a.parameters, b.parameters, .7)
 			new_generation[i] = self.Individual(gt.mutate(child, self.mutation_rate, 10))
 		self.individuals = new_generation
+		self.generation += 1
 
 	def run_models(self):
 		for i in range(self.n):
@@ -59,11 +62,22 @@ class Population(object):
 				run.timestep(1)
 			self.individuals[i].surface = run.get_surface_elev()
 			self.individuals[i].fitness = self.fitness_function.evaluate_bed(self.individuals[i].bed, self.individuals[i].surface)
+			if(i%10==0):
+				print 'on individual', i, 'of', self.n
+
+	def save_iteration(self, filename):
+		with open(filename, 'w') as f:
+			pickle.dump((self.generation, self.individuals), f)
+
+	def load_iteration(self, filename):
+		with open(filename) as f:
+			self.generation, self.individuals = pickle.load(f)
 
 
 def main():
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(500, 2, 20, fitness_function)
+	population = Population(400, 2, 20, fitness_function)
+	print 'population created'
 	population.run_models()
 	population.evolve()
 	population.run_models()
