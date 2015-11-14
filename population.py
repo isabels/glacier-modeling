@@ -5,8 +5,11 @@ import basic_model
 import evaluate_bed
 import generate_bed as bed
 import pickle
+import tools
 
 class Population(object):
+
+	base = tools.load_nolan_bedrock()
 
 	class Individual(object):
 
@@ -16,23 +19,28 @@ class Population(object):
 		def to_string(self):
 			print self.parameters, self.fitness
 
-	def __init__(self, size, length, param_range, fitness_function):
+	def __init__(self, size, length, zmin, zmax, fitness_function):
 		self.generation = 0
 		self.n = size
-		self.individuals = np.empty(size, dtype=object)
+		self.individuals = np.empty(length, dtype=object)
 		self.param_range = param_range
 		for i in range(size):
-			self.individuals[i] = self.Individual(gt.create(size, param_range))#gt.create(length, param_range))
+			self.individuals[i] = self.Individual(gt.create(size, zmin, zmax))#gt.create(length, param_range))
 		self.mutation_rate = 1.0/length
 		self. pool_size = 10
 		self.fitness_function = fitness_function
 
-	def best_fitness(self):
+	def best_fitness(self, return_index=False): #will return the index of best one as well when index is true
 		best = float("inf")
+		index = -1
 		for i in range(self.n):
 			if(self.individuals[i].fitness < best):
-				best = current
-		return best
+				best = self.individuals[i].fitness
+				index = i
+		if(return_index):
+			return (index, best)
+		else:
+			return best
 
 	def choose(self): #returns the index in self.individuals of the fittest of the 10
 		best = float("inf")
@@ -40,7 +48,7 @@ class Population(object):
 		for i in range(self.pool_size):
 			index = random.randint(0, self.n-1)
 			if(self.individuals[index].fitness < best):
-				best = current
+				best = self.individuals[i].fitness
 				best_index = index
 		return(self.individuals[best_index])
 
@@ -56,7 +64,7 @@ class Population(object):
 
 	def run_models(self):
 		for i in range(self.n):
-			self.individuals[i].bed = bed.generate_bed(self.individuals[i].parameters)
+			self.individuals[i].bed = self.individuals[i].parameters + self.base #applies randomness over nolan bed
 			run = basic_model.isothermalISM(58, 1000, .0015, .0005, .00022, self.individuals[i].bed[:])
 			for j in range(2000):
 				run.timestep(1)
@@ -76,12 +84,14 @@ class Population(object):
 
 def main():
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(400, 2, 20, fitness_function)
-	print 'population created'
-	population.run_models()
-	population.evolve()
-	population.run_models()
-	print [item.to_string() for item in population.individuals]
+	population = Population(4, 58, -50, 50, fitness_function)
+	#population of 400
+	#58 parameters
+	#can differ from nolan bed by up to 500 m at each node in increments of 10m so -50 - 50 range for parameters
+	while(population.best_fitness() > 1000):
+		population.run_models()
+		population.evolve()
+		print population.best_fitness(True)
 
 
 

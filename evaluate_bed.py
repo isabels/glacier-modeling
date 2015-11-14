@@ -29,7 +29,7 @@ class FitnessFunction(object):
 
 
 	#function to evaluate fitness of the bed, returns number which is fitness, lower is better
-	def evaluate_bed(self,bed_elev, surf_elev):
+	def evaluate(self,bed_elev, surf_elev):
 		return self.constrain_to_reality(bed_elev) + self.constrain_to_nolan(bed_elev) + tools.calculate_surface_difference(surf_elev, self.gps_surface)
 		#constrain to realistic data (no huge spikes)
 		#constrain to reality via not more than 500 from bedtopo? (or is this more or less included in the other ones)
