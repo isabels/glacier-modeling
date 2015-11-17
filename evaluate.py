@@ -3,7 +3,7 @@ import tools
 import basic_model
 
 class FitnessFunction(object):
-	penalty = float("inf")
+	penalty = 5000.
 
 	def __init__(self):
 		self.gps_surface = tools.load_first_guess_surface()
