@@ -72,6 +72,8 @@ class Population(object):
 
 
 	def run_models(self, job_server):
+		for i in range(self.n):
+			self.individuals[i].bed = map(operator.add, self.individuals[i].parameters, self.base)
 
 		# sum_primes - the function
 # (100,) - tuple with arguments for sum_primes
@@ -80,7 +82,7 @@ class Population(object):
 # Execution starts as soon as one of the workers will become available
 		print 'in run models'
 		# jobs = [(i, job_server.submit(self.run_model,(self.individuals[i].parameters,self.base, self.fitness_function), (), ())) for i in range(self.n)]
-		jobs = [(i, job_server.submit(run_model,(self.individuals[i].parameters,self.base), (), ("operator", "basic_model"))) for i in range(self.n)]
+		jobs = [(i, job_server.submit(run_model,(self.individuals[i].bed, basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:]), self.fitness_function), (), ("operator", "basic_model", "tools"))) for i in range(self.n)]
 
 		print 'jobs created!'
 		print jobs
@@ -111,17 +113,14 @@ class Population(object):
 	def load_iteration(self, filename):
 		return False # implement this when you need it, future isabel, i don't care
 
-def run_model(parameters, base): #runs one model. to make things parallelizable
+def run_model(bed, run, fitness_function): #runs one model. to make things parallelizable
+	for j in range(2000):
+		run.timestep(1)
+	surf = run.get_surface_elev()
+	fitness = fitness_function.evaluate(bed, surf)
 
-	bed = map(operator.add, base, parameters), 
-	run = basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, bed[:])
-	# # for j in range(2000):
-	# 	# run.timestep(1)
-	# surf = run.get_surface_elev()
-	# fitness = fitness_function.evaluate(bed, surf)
-
-	# return fitness
-	return bed
+	return fitness
+	# return surf
 
 def main():
 	job_server = pp.Server()
