@@ -8,6 +8,7 @@ import tools
 import csv
 import operator
 import pp
+import time
 
 class Individual(object):
 
@@ -71,38 +72,28 @@ class Population(object):
 	# def run_model(self, parameters, base, fitness_function): #runs one model. to make things parallelizable
 
 
-	def run_models(self, job_server):
-		for i in range(self.n):
-			self.individuals[i].bed = map(operator.add, self.individuals[i].parameters, self.base)
-
-		# sum_primes - the function
-# (100,) - tuple with arguments for sum_primes
-# (isprime,) - tuple with functions on which function sum_primes depends
-# ("math",) - tuple with module names which must be imported before sum_primes execution
-# Execution starts as soon as one of the workers will become available
-		print 'in run models'
-		# jobs = [(i, job_server.submit(self.run_model,(self.individuals[i].parameters,self.base, self.fitness_function), (), ())) for i in range(self.n)]
-		jobs = [(i, job_server.submit(run_model,(self.individuals[i].bed, basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:]), self.fitness_function), (), ("operator", "basic_model", "tools"))) for i in range(self.n)]
-
-		print 'jobs created!'
-		print jobs
-		for i, job in jobs:
-			print 'in for loop, about to call job'
-			self.individuals[i].fitness = job()
-			print 'on individual', i, 'of', self.n
-			print 'fitness', self.individuals[i].fitness
-		# for i in range(self.n):
-			# self.individuals[i].bed = map(add, self.base, self.individuals[i].parameters)
-			# run = basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:])
-			# for j in range(2000):
-			# 	run.timestep(1)
-
-			#job1 = job_server.submit(sum_primes, (100,), (isprime,), ("math",))
-			
-			#self.individuals[i].surface = self.run_model(self.individuals[i].bed[:])
-			# self.individuals[i].fitness = self.run_model(self.individuals[i].parameters, self.base, self.fitness_function)
-			# print 'on individual', i, 'of', self.n
-			# print 'fitness', self.individuals[i].fitness
+	def run_models(self, parallelize = False, job_server = None): #defaults to running in serial, can make it parallel w/ params.
+		if(parallelize):
+			for i in range(self.n):
+				#gotta do this in serial first, because it's an argument to isothermalISM, which needs to be created in serial (or so it seems. but it's working now so i'm not gonna mess with it)
+				self.individuals[i].bed = map(operator.add, self.individuals[i].parameters, self.base)
+			#creates list of tuples of i and job running i's model
+			jobs = [(i, job_server.submit(run_model,(self.individuals[i].bed, basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:]), self.fitness_function), (), ("operator", "basic_model", "tools"))) for i in range(self.n)]
+			print 'jobs created'
+			for i, job in jobs:
+				self.individuals[i].fitness = job()
+				print 'on individual', i, 'of', self.n
+				print 'fitness', self.individuals[i].fitness
+		else:
+			for i in range(self.n):
+				self.individuals[i].bed = map(operator.add, self.base, self.individuals[i].parameters)
+				run = basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:])
+				for j in range(2000):
+					run.timestep(1)				
+				self.individuals[i].surface = run.get_surface_elev()
+				self.individuals[i].fitness = self.fitness_function.evaluate(self.individuals[i].bed, self.individuals[i].surface)
+				print 'on individual', i, 'of', self.n
+				print 'fitness', self.individuals[i].fitness
 
 	def save_iteration(self, filename):
 		with open(filename, 'wb') as csvfile:
@@ -126,8 +117,15 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(5, 58, -500, 500, fitness_function)
-	population.run_models(job_server) #initial run at generation 0 before we start evolving
+	population = Population(10, 58, -500, 500, fitness_function)
+	print 'evaluating in parallel'
+	start = time.time()
+	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	print 'time elapsed', time.time() - start, '\n'
+	print 'evaluating in series'
+	start = time.time()
+	population.run_models()
+	print 'time elapsed', time.time() - start
 	
 	# best fitness can't be computed until after models are all run. so makes sense to start while loop after initial run of models
 	
