@@ -8,6 +8,8 @@ import tools
 import csv
 from operator import add 
 
+import pp
+
 class Population(object):
 
 	base = tools.load_nolan_bedrock()
@@ -68,41 +70,51 @@ class Population(object):
 		self.individuals = new_generation
 		self.generation += 1
 
-	def run_models(self):
+	def run_model(self, parameters, base): #runs one model. to make things parallelizable
+		bed = map(add, base, parameters)
+		run = basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, bed)
+		for j in range(2000):
+			run.timestep(1)
+		return run.get_surface_elev()
+
+	def run_models(self, job_server):
 		for i in range(self.n):
-			self.individuals[i].bed = map(add, self.base, self.individuals[i].parameters)
-			run = basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:])
-			for j in range(2000):
-				run.timestep(1)
-			self.individuals[i].surface = run.get_surface_elev()
+			# self.individuals[i].bed = map(add, self.base, self.individuals[i].parameters)
+			# run = basic_model.isothermalISM(58, 1500, .0015, .0005, .00022, self.individuals[i].bed[:])
+			# for j in range(2000):
+			# 	run.timestep(1)
+
+			#job1 = job_server.submit(sum_primes, (100,), (isprime,), ("math",))
+			
+			self.individuals[i].surface = self.run_model(self.individuals[i].bed[:])
 			self.individuals[i].fitness = self.fitness_function.evaluate(self.individuals[i].bed, self.individuals[i].surface)
 			print 'on individual', i, 'of', self.n
 			print 'fitness', self.individuals[i].fitness
 
-
 	def save_iteration(self, filename):
-		with open('filename', 'wb') as csvfile:
+		with open(filename, 'wb') as csvfile:
 			writer = csv.writer(csvfile)
 			for i in range(self.n):
-				writer.writerow([str(self.individuals[i].parameters).strip('[]'), self.individuals[i].fitness])
+				writer.writerow([str(self.individuals[i].parameters).strip('"[]"'), self.individuals[i].fitness])
 
 	def load_iteration(self, filename):
 		return False # implement this when you need it, future isabel, i don't care
 
 
 def main():
+	job_server = pp.Server()
+	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	#population = Population(500, 58, -500, 500, fitness_function)
-	population = Population(5, 58, -500, 500, fitness_function)
-	population.run_models() #initial run at generation 0 before we start evolving
+	population = Population(500, 58, -500, 500, fitness_function)
+	population.run_models(job_server) #initial run at generation 0 before we start evolving
 	
 	# best fitness can't be computed until after models are all run. so makes sense to start while loop after initial run of models
 	
 	while(population.best_fitness() > 500):
 		population.evolve()
-		population.run_models()
+		population.run_models(job_server)
 		print population.best_fitness(True) #now this reflects generation that has just been done
-		population.save_iteration('gen%d' % population.generation)
+		population.save_iteration('generation%d.csv' % population.generation)
 
 
 
