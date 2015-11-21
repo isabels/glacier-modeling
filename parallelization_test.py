@@ -39,7 +39,7 @@ print "Starting pp with", job_server.get_ncpus(), "workers\n"
 # (isprime,) - tuple with functions on which function sum_primes depends
 # ("math",) - tuple with module names which must be imported before sum_primes execution
 # Execution starts as soon as one of the workers will become available
-#job1 = job_server.submit(sum_primes, (100,), (isprime,), ("math",))
+job1 = job_server.submit(sum_primes, (100,), (isprime,), ("math",))
 
 # Retrieves the result calculated by job1
 # The value of job1() is the same as sum_primes(100)
