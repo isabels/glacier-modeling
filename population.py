@@ -8,7 +8,6 @@ import tools
 import csv
 import operator
 import pp
-import time
 
 class Individual(object):
 
@@ -30,10 +29,8 @@ class Population(object):
 		self.zmax = zmax
 		for i in range(self.n):
 			self.individuals[i] = Individual(gt.create(length, zmin, zmax))#gt.create(length, param_range))
-		self.mutation_rate = 1.0/length
-		#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self. pool_size = 25 #CHANGE THIS BACK!!!!!! #this is how many you pick the best for for evolution. NOT the population size.
-		#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		self.mutation_rate = 2.0/length #trying w/ slightly more common mutation. we'll see what happens.
+		self. pool_size = 25 #this is how many you pick the best for for evolution. NOT the population size.
 		self.fitness_function = fitness_function
 
 	def best_fitness(self, return_index=False): #will return the index of best one as well when index is true
@@ -83,7 +80,6 @@ class Population(object):
 			for i, job in jobs:
 				self.individuals[i].fitness = job()
 				print 'on individual', i, 'of', self.n
-				print 'fitness', self.individuals[i].fitness
 		else:
 			for i in range(self.n):
 				self.individuals[i].bed = map(operator.add, self.base, self.individuals[i].parameters)
@@ -104,7 +100,7 @@ class Population(object):
 	def load_iteration(self, filename):
 		return False # implement this when you need it, future isabel, i don't care
 
-def run_model(bed, run, fitness_function): #runs one model. to make things parallelizable
+def run_model(bed, run, fitness_function): #runs one model. for parallelization.
 	for j in range(2000):
 		run.timestep(1)
 	surf = run.get_surface_elev()
@@ -117,23 +113,15 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(10, 58, -500, 500, fitness_function)
-	print 'evaluating in parallel'
-	start = time.time()
+	population = Population(100, 58, -500, 500, fitness_function)
 	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
-	print 'time elapsed', time.time() - start, '\n'
-	print 'evaluating in series'
-	start = time.time()
-	population.run_models()
-	print 'time elapsed', time.time() - start
 	
-	# best fitness can't be computed until after models are all run. so makes sense to start while loop after initial run of models
-	
-	# while(population.best_fitness() > 500):
-	# 	population.evolve()
-	# 	population.run_models(job_server)
-	# 	print population.best_fitness(True) #now this reflects generation that has just been done
-	# 	population.save_iteration('generation%d.csv' % population.generation)
+	while(population.best_fitness() > 500):
+		population.evolve()
+		population.run_models(True,job_server)
+		print population.best_fitness(True) #now this reflects generation that has just been done
+		population.save_iteration('generation%d.csv' % population.generation)
+	print "best fitness better than 500, program has finished."
 
 
 
