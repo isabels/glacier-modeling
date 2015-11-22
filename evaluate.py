@@ -3,7 +3,7 @@ import tools
 import basic_model
 
 class FitnessFunction(object):
-	penalty = 5000.
+	penalty = 1000.
 
 	def __init__(self):
 		self.gps_surface = tools.load_first_guess_surface()
@@ -12,7 +12,7 @@ class FitnessFunction(object):
 	def constrain_to_nolan(self,bed_elev):
 		nodes_to_check = (1,5, 12, 20, 32)
 		expected_values = (-70,-200, -500, -600, -250)
-		error = 50 #a rough average between the 30 for one reading and the 150 for the other. Welp.
+		error = 100 #a rough average between the 30 for one reading and the 150 for the other. Welp.
 		for node,val in zip(nodes_to_check, expected_values):
 			if (bed_elev[node] > val + error) or (bed_elev[node] < val - error):
 				return self.penalty

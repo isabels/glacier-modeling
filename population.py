@@ -32,7 +32,7 @@ class Population(object):
 			self.individuals[i] = Individual(gt.create(length, zmin, zmax))#gt.create(length, param_range))
 		self.mutation_rate = 1.0/length
 		#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		self. pool_size = 10 #CHANGE THIS BACK!!!!!! #this is how many you pick the best for for evolution. NOT the population size.
+		self. pool_size = 25 #CHANGE THIS BACK!!!!!! #this is how many you pick the best for for evolution. NOT the population size.
 		#!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		self.fitness_function = fitness_function
 
