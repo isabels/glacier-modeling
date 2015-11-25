@@ -23,8 +23,8 @@ def cross(a, b, cross_probability):
 
 #using creep mutation (mutate by adding/subtracting from current number)
 def mutate(s, rate, zmin, zmax):
-	temp = []
-	for i in range(len(s)):
+	temp = [0]
+	for i in range(1, len(s)-1):#can't accidentally mutate ends, they're supposed to be 0
 		if(random.random() <= rate):
 			temp.append(s[i] + random.gauss(0, 40)) #SD of 160 should lead to max values of about 500? maybe this should be in general smaller. should i just have it move each by like at most 50 each time???????
 			if temp[i] > zmax:
@@ -33,6 +33,7 @@ def mutate(s, rate, zmin, zmax):
 				temp[i] = zmin #can't get outside of 500m range
 		else:
 			temp.append(s[i])
+	temp.append(0)
 	return temp
 
 #generates a random topo based on the nolan topo with randomized ranges and smoothing levels

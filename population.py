@@ -28,7 +28,7 @@ class Population(object):
 		self.zmax = zmax
 		for i in range(self.n):
 			self.individuals[i] = Individual(gt.create(length, zmin, zmax))#gt.create(length, param_range))
-		self.mutation_rate = 2.0/length #trying w/ slightly more common mutation. we'll see what happens.
+		self.mutation_rate = 1.0/length #trying w/ slightly more common mutation. we'll see what happens.
 		self. pool_size = 25 #this is how many you pick the best for for evolution. NOT the population size.
 		self.fitness_function = fitness_function
 
@@ -113,7 +113,7 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(10, 58, -500, 500, fitness_function)
+	population = Population(5, 58, -500, 500, fitness_function)
 	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
 	
 	while(population.best_fitness() > 500):
