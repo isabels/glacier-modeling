@@ -113,12 +113,15 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(5, 58, -500, 500, fitness_function)
+	population = Population(2000, 58, -500, 500, fitness_function)
 	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
-	
-	while(population.best_fitness() > 500):
+	best_fitness = population.best_fitness()
+	prev_best_fitness = float("inf")
+	while(population.best_fitness() >= prev_best_fitness):
+		prev_best_fitness = best_fitness
 		population.evolve()
 		population.run_models(True,job_server)
+		best_fitness = population.best_fitness()
 		print population.best_fitness(True) #now this reflects generation that has just been done
 		population.save_iteration('generation%d.csv' % population.generation)
 	print "best fitness better than 500, program has finished."
