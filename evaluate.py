@@ -29,7 +29,7 @@ class FitnessFunction(object):
 		return 0
 
 	def smoothness_constraint(self, bed_elev): #penalizes for each wiggle that is not in the direction of the greater slope
-		pen = 50 #try changing to like 20? is this too harsh?
+		pen =20 #try changing to like 20? is this too harsh?
 		total = 0
 		for i in range(1, len(bed_elev)):
 			if (i<=20): #sloping down still
