@@ -97,8 +97,15 @@ class Population(object):
 			for i in range(self.n):
 				writer.writerow([str(self.individuals[i].parameters).strip('"[]"'), self.individuals[i].fitness])
 
-	def load_iteration(self, filename):
-		return False # implement this when you need it, future isabel, i don't care
+	def load_iteration(self, filename, gen):
+		self.generation = gen
+		with open(filename, 'rU') as csvfile:
+			reader = csv.reader(csvfile, dialect='excel')
+			index = 0
+			for row in reader:
+				self.individuals[index].parameters = [float(i) for i in row[0].split(',')]
+				self.individuals[index].fitness = row[1]
+				index += 1
 
 def run_model(bed, run, fitness_function): #runs one model. for parallelization.
 	for j in range(2000):
@@ -113,11 +120,12 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(2000, 58, -500, 500, fitness_function)
-	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	population = Population(200, 58, -500, 500, fitness_function)
+	population.load_iteration('generation21.csv', 21)
+	# population.run_models(True,job_server) #initial run at generation 0 before we start evolving
 	best_fitness = population.best_fitness()
 	prev_best_fitness = float("inf")
-	while(population.best_fitness() >= prev_best_fitness):
+	while(best_fitness <= prev_best_fitness):
 		prev_best_fitness = best_fitness
 		population.evolve()
 		population.run_models(True,job_server)
