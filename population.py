@@ -120,7 +120,7 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(200, 58, -500, 500, fitness_function)
+	population = Population(2000, 58, -500, 500, fitness_function)
 	population.load_iteration('generation21.csv', 21)
 	# population.run_models(True,job_server) #initial run at generation 0 before we start evolving
 	best_fitness = population.best_fitness()
