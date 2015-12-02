@@ -6,6 +6,7 @@ import scipy.sparse.linalg as linalg
 import tools
 import scipy.io.netcdf as ncdf
 import matplotlib.pyplot as mp
+import operator
 
 class isothermalISM(object):
     p = 918 #density of ice
@@ -14,9 +15,11 @@ class isothermalISM(object):
     glenns_n = 3 #power of glenn's flow law
     nodes_past_divide = 20 #used to add things to mass balance
     
-    def __init__(self,num_nodes,dx,slide_parameter, b): #initializes the model's fields
+    def __init__(self,num_nodes,dx,bslip_1, bslip_2, bslip_3, b): #initializes the model's fields
         self.dx = dx 
-        self.slide_parameter = slide_parameter 
+        self.bslip_1 = bslip_1
+        self.bslip_2 = bslip_2
+        self.bslip_3 = bslip_3
         self.num_nodes = num_nodes + 20
 
         self.time = 0 
@@ -27,8 +30,7 @@ class isothermalISM(object):
         for i in range(1210, 410, -40):
             self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
-        self.mass_balance = tools.load_mbal()
-        print 'mbal', len(self.mass_balance)
+        self.mass_balance = tools.load_mbal('reduced_smoothed_mbal.csv')
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
@@ -56,7 +58,12 @@ class isothermalISM(object):
         D = np.zeros(self.num_nodes)
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         for i in range(0,self.num_nodes):
-            D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.slide_parameter*self.p*self.g*(self.ice_thickness[i]**2))
+            if(i<20):
+                D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_1*self.p*self.g*(self.ice_thickness[i]**2))
+            elif(i<40):
+                D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_2*self.p*self.g*(self.ice_thickness[i]**2))
+            else:
+                D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_3*self.p*self.g*(self.ice_thickness[i]**2))
         
         A = sparse.lil_matrix((self.num_nodes,self.num_nodes)) 
         A[0, 0] = 1 
@@ -91,12 +98,15 @@ class isothermalISM(object):
     def get_ice_thickness(self):
         return self.ice_thickness
 
+    def get_surface_elev(self):
+        return self.surface_elev
+
 def main():
     b0 = tools.load_bedtopo()
     run1 = isothermalISM(58, 1000, 0.0005, b0) #55 nodes, 1000-meter spacing,  basal slip of zero
     run1.openOutput('random_bed.nc')
 
-    for i in range(5000): #5000 years
+    for i in range(1500): #5000 years
         run1.timestep(1)
         if(i%100==0): 
             print 'on timestep', i

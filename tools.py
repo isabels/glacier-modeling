@@ -13,12 +13,12 @@ def calculate_slopes(elev, dx):
 	slopes[len(elev)-1] = (elev[len(elev)-1] - elev[len(elev)-2]) / dx
 	return slopes
 
-def load_mbal(fulldata=False):
+def load_mbal(filename, fulldata=False):
 	#includes points past divide
 	mbal=[]
 	count = 0
 
-	with open('TAKU_MBAL_DATA.csv', 'rU') as csvfile:
+	with open(filename, 'rU') as csvfile:
 		reader = csv.reader(csvfile, dialect='excel')
 		for row in reader:
 			if(fulldata):
@@ -51,8 +51,8 @@ def load_gps_surface():
 
 def calculate_surface_difference(calc_surf, obs_surf):
 	diff = 0
-	calc_surf = calc_surf[0:55]
-	obs_surf = obs_surf[0:55]
+	calc_surf = calc_surf[0:57] #ugh this is so dumb but whatever
+	#obs_surf = obs_surf[0:55]
 	for i in range(len(calc_surf)):
 		diff += (calc_surf[i] - obs_surf[i])**2
 	return math.sqrt(diff)
@@ -69,6 +69,7 @@ def plot_model_run(fname): #reads and plots data from the output file
 	mp.plot(x, elev[len(time)-1], 'cyan')
 	surf_elev = load_first_guess_surface()
 	mp.plot(range(0, 57000, 1000), surf_elev, 'red')
+	mp.plot(range(0, 58000, 1000), load_nolan_bedrock(), 'black')
 	diff = calculate_surface_difference(elev[len(time)-1], surf_elev)
 	mp.title(diff)
 	mp.show()
