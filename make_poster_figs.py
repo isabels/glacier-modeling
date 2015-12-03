@@ -8,7 +8,7 @@ import csv
 # matplotlib.use('Agg')
 import matplotlib.pyplot as mp
 
-# f = ncdf.netcdf_file('smooth.nc', 'r')
+# f = ncdf.netcdf_file('medium.nc', 'r')
 # elev = f.variables['surface_elev']
 # bed = f.variables['bed_elev']
 # time = f.variables['time']
@@ -24,12 +24,12 @@ import matplotlib.pyplot as mp
 # mp.plot(x[0:57], surf_elev, 'red', label='observed surface', lw=2)
 # mp.plot(x[0:58], bed_elev, 'black', label='first guess surface')
 # mp.axis([-2000, 60000, -1000, 2000])
-# mp.title('Higher error value, but more realistic')
+# mp.title('Slightly lower error value, but still fairly realistic')
 # mp.ylabel('Elevation (m)')
 # mp.xlabel('Distance from terminus (m)')
 # # mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
 # mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
-# mp.savefig('better.png', dpi=300)
+# mp.savefig('medium.png', dpi=300)
 
 # #########and now the old model run. gonna copy and paste some code because i'm too lazy to refactor and want to be able to reproduce either figure
 # mp.clf()
@@ -90,91 +90,113 @@ def read_in_beds(filename):
 				beds.append([float(i) for i in row[0].split(',')])
 	return beds
 
-# bed_elev = tools.load_nolan_bedrock()
-# fig = mp.figure()
-# ax = fig.add_subplot(1,1,1)
-
-# x = range(0, 58000, 1000)
-# ax.plot(x, bed_elev, 'black', label='first guess surface', lw=2)
-
-
-# beds = read_in_beds('generation39.csv')
-# b0 = beds[0]
-# base = tools.load_nolan_bedrock()
-# b0 = map(operator.add, b0, base)
-
-# ax.plot(x, b0, 'green', label='beds with roughness constraint', lw=2)
-
-# for i in range(1, 50):
-# 	b0 = beds[i]
-# 	base = tools.load_nolan_bedrock()
-# 	b0 = map(operator.add, b0, base)
-
-# 	ax.plot(x, b0, 'green', lw=1)
-
-# beds2 = read_in_beds('generation1.csv')
-# b0 = beds2[0]
-# base = tools.load_nolan_bedrock()
-# b0 = map(operator.add, b0, base)
-
-# ax.plot(x, b0, 'red', label='beds without roughness constraint', lw=2)
-
-# for i in range(1, 500):
-# 	b0 = beds2[i]
-# 	base = tools.load_nolan_bedrock()
-# 	b0 = map(operator.add, b0, base)
-
-# 	ax.plot(x, b0, 'red', lw=1)
-
-# ax.scatter([1000,5000, 12000, 20000, 32000],[-70,-200, -500, -600, -250], label='seimsic data points')
-
-
-# ax.axis([-2000, 60000, -1000, 2000])
-# mp.title('Beds with lowest error')
-# mp.ylabel('Elevation (m)')
-# mp.xlabel('Distance from terminus (m)')
-# # mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
-# mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
-# fig.savefig('beds.png', dpi=300)
-
-##### GENERATION COMPARISON
 bed_elev = tools.load_nolan_bedrock()
+fig = mp.figure()
+ax = fig.add_subplot(1,1,1)
 
-for i in range(1,10):
-	fig = mp.figure()
-	ax = fig.add_subplot(1,1,1)
+x = range(0, 58000, 1000)
+ax.plot(x, bed_elev, 'black', label='first guess surface', lw=2)
+#### WITHOUT
+
+beds2 = read_in_beds('generation14-exp2.csv')
+b0 = beds2[0]
+base = tools.load_nolan_bedrock()
+b0 = map(operator.add, b0, base)
+
+ax.plot(x, b0, 'red', label='beds without roughness constraint', lw=2)
+
+for i in range(1, 5):
+	b0 = beds2[i]
+	base = tools.load_nolan_bedrock()
+	b0 = map(operator.add, b0, base)
+	ax.plot(x, b0, 'red', lw=1)
 
 
-	fig = mp.figure()
-	ax = fig.add_subplot(1,1,1)
 
-	x = range(0, 58000, 1000)
-	ax.plot(x, bed_elev, 'black', label='first guess surface', lw=2)
+#STRICT
+beds = read_in_beds('generation14-exp3.csv')
+b0 = beds[0]
+base = tools.load_nolan_bedrock()
+b0 = map(operator.add, b0, base)
+
+ax.plot(x, b0, 'green', label='beds with strict roughness constraint', lw=2)
 
 
-	beds = read_in_beds('generation%d.csv' % i)
-	b0 = beds[0]
+
+for i in range(1, 5):
+	b0 = beds[i]
 	base = tools.load_nolan_bedrock()
 	b0 = map(operator.add, b0, base)
 
-
-	ax.plot(x, b0, 'red', label='beds without roughness constraint', lw=2)
-
-	for j in range(1, 500):
-		b0 = beds[j]
-		base = tools.load_nolan_bedrock()
-		b0 = map(operator.add, b0, base)
-
-		ax.plot(x, b0, 'red', lw=1)
-
-	ax.scatter([1000,5000, 12000, 20000, 32000],[-70,-200, -500, -600, -250], label='seimsic data points')
+	ax.plot(x, b0, 'green', lw=1)
 
 
-	ax.axis([-2000, 60000, -1000, 2000])
-	mp.title('Beds from generation %d' % i)
-	mp.ylabel('Elevation (m)')
-	mp.xlabel('Distance from terminus (m)')
-	# mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
-	mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
-	fig.savefig('graph_generation%d.png' % i, dpi=300)
+
+
+### MEDIUM
+
+beds3 = read_in_beds('generation14-exp4.csv')
+b0 = beds3[0]
+base = tools.load_nolan_bedrock()
+b0 = map(operator.add, b0, base)
+ax.plot(x, b0, 'blue', label='beds with smaller roughness constraint', lw=2)
+
+for i in range(1, 5):
+	b0 = beds3[i]
+	base = tools.load_nolan_bedrock()
+	b0 = map(operator.add, b0, base)
+
+	ax.plot(x, b0, 'blue', lw=1)
+
+ax.scatter([1000,5000, 12000, 20000, 32000],[-70,-200, -500, -600, -250], label='seimsic data points')
+
+
+ax.axis([-2000, 60000, -1000, 2000])
+mp.title('Beds with lowest error')
+mp.ylabel('Elevation (m)')
+mp.xlabel('Distance from terminus (m)')
+# mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
+mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
+fig.savefig('beds.png', dpi=300)
+
+##### GENERATION COMPARISON
+# bed_elev = tools.load_nolan_bedrock()
+
+# for i in range(1,10):
+# 	fig = mp.figure()
+# 	ax = fig.add_subplot(1,1,1)
+
+
+# 	fig = mp.figure()
+# 	ax = fig.add_subplot(1,1,1)
+
+# 	x = range(0, 58000, 1000)
+# 	ax.plot(x, bed_elev, 'black', label='first guess surface', lw=2)
+
+
+# 	beds = read_in_beds('generation%d.csv' % i)
+# 	b0 = beds[0]
+# 	base = tools.load_nolan_bedrock()
+# 	b0 = map(operator.add, b0, base)
+
+
+# 	ax.plot(x, b0, 'red', label='beds without roughness constraint', lw=2)
+
+# 	for j in range(1, 500):
+# 		b0 = beds[j]
+# 		base = tools.load_nolan_bedrock()
+# 		b0 = map(operator.add, b0, base)
+
+# 		ax.plot(x, b0, 'red', lw=1)
+
+# 	ax.scatter([1000,5000, 12000, 20000, 32000],[-70,-200, -500, -600, -250], label='seimsic data points')
+
+
+# 	ax.axis([-2000, 60000, -1000, 2000])
+# 	mp.title('Beds from generation %d' % i)
+# 	mp.ylabel('Elevation (m)')
+# 	mp.xlabel('Distance from terminus (m)')
+# 	# mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
+# 	mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
+# 	fig.savefig('graph_generation%d.png' % i, dpi=300)
 
