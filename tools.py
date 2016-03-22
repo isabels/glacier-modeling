@@ -46,6 +46,16 @@ def load_gps_surface():
 		surf_elev.append(float(data[1]))
 	return (surf_dist, surf_elev)
 
+def load_flowline():
+	easting = []
+	northing = []
+	flowline = open('taku_flowline.csv', 'r')
+	for line in flowline.readlines():
+		data = line.split(',')
+		easting.append(float(data[0]))
+		northing.append(float(data[1]))
+	return (easting, northing)
+
 def calculate_surface_difference(calc_surf, obs_surf):
 	diff = 0
 	calc_surf = calc_surf[0:57] #ugh this is so dumb but whatever
@@ -154,7 +164,12 @@ def load_first_guess_surface():
 	f.close()
 	return observed_surface
 
-
+easting, northing = load_flowline()
+dist = 0
+for i in range(length(easting) - 1):
+	dist += sqrt((easting[i+1]-easting[i])^2 + (northing[i+1]-northing[i])^2)
+dist = dist / length(easting) - 1
+print(dist) #this is avg distance between sequential points on flowline, in m.
 	
 
 
