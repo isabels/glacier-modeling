@@ -88,12 +88,33 @@ class isothermalISM(object):
         self.ice_thickness = self.surface_elev - self.bed_elev
         self.time += dt
         
-    def calculate_velocity(self): #calculates and prints out the current velocity at each node
+    def calculate_velocity(self): #calculates and prints out the current SURFACE velocity at each node
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         velocity = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
-            velocity[i] = ((-(2*self.glenns_a*(self.p*-9.81)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.slide_parameter*self.p*-9.81*self.ice_thickness[i]*slopes[i])
-            print('velocity at node ', i, 'is: ', velocity[i])
+            if(i<20):
+                velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.bslip_1*self.p*-self.g*self.ice_thickness[i]*slopes[i])
+
+            elif(i<40):
+                velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.bslip_2*self.p*-self.g*self.ice_thickness[i]*slopes[i])
+
+            else:
+                velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.bslip_3*self.p*-self.g*self.ice_thickness[i]*slopes[i])
+            print 'velocity at node ', i, 'is: ', velocity[i]
+
+    def calculate_basal_velocity(self): #this calculates the basal sliding portion of velocity to see if it's reasonable
+        slopes = tools.calculate_slopes(self.surface_elev, self.dx)
+        basal_velocity = np.zeros(self.num_nodes)
+        for i in range(self.num_nodes):
+            if(i<20):
+                basal_velocity[i] = -(self.bslip_1*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
+
+            elif(i<40):
+                basal_velocity[i] = -(self.bslip_2*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
+
+            else:
+                basal_velocity[i] = -(self.bslip_3*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
+            print 'basal velocity at node ', i, 'is: ', basal_velocity[i]
 
     def get_ice_thickness(self):
         return self.ice_thickness
@@ -104,7 +125,7 @@ class isothermalISM(object):
 def main():
     b0 = [-53.86014283247338, -96.55148545680116, -209.56378728526175, -329.5285447843742, -276.1078577736731, -99.4682311472077, -74.60838257235906, 103.76931702628877, 199.59759885797695, 325.49387992076936, 294.9387516971606, 190.74077827555544, 95.99117577626988, 252.4851292030383, 410.3736616110993, 500, 500, 444.71357635367707, 326.35184433516275, 223.25791552817049, 98.55471776145947, 134.18167926051117, 30.336550811088184, -88.39136174706994, -121.36948314990242, -18.45822543176338, -66.01158355801323, 52.93628093781889, -92.66509252409524, 15.70587677548626, -22.132177754463765, 6.391541935525751, -68.42339808954196, 39.59640808291448, 53.464027842215515, 136.78502122848863, 254.14520471035019, 192.5665648106059, 65.30439277418417, 14.10079843084735, -114.02424000705798, -289.4634592194706, -303.0305745281302, -266.62019841090347, -198.4732468197231, -210.421471160374, -143.2408448139692, -66.7972463258127, -18.769521382966776, 46.9742033841991, 105.26603075720368, 164.98279637713722, -43.50064538327361, -79.11047511726842, -3.8891318593645394, 12.390579201231496, -59.56957705146683, 0]
     base = tools.load_nolan_bedrock()
-    b0 = map(operator.add, base, b0)
+    b0 = base#map(operator.add, base, b0)
 
     run1 = isothermalISM(58, 1000, 0.0015, .0005, 0.00022, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
     run1.openOutput('run1.nc')
@@ -114,7 +135,8 @@ def main():
         if(i%100==0): 
             print 'on timestep', i
             run1.write()
-    #run1.calculate_velocity()   
+    run1.calculate_basal_velocity()  
+    run1.calculate_velocity() 
     run1.close()
     tools.plot_model_run('run1.nc')
 
