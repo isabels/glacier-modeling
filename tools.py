@@ -165,11 +165,10 @@ def load_first_guess_surface():
 	return observed_surface
 
 easting, northing = load_flowline()
-dist = 0
-for i in range(length(easting) - 1):
-	dist += sqrt((easting[i+1]-easting[i])^2 + (northing[i+1]-northing[i])^2)
-dist = dist / length(easting) - 1
-print(dist) #this is avg distance between sequential points on flowline, in m.
+dist = []
+for i in range(len(easting) - 1):
+	dist.append(math.sqrt((easting[i+1]-easting[i])**2 + (northing[i+1]-northing[i])**2))
+print(np.mean(dist), np.std(dist)) #this is avg distance between sequential points on flowline, in m.
 	
 
 
