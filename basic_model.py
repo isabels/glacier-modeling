@@ -15,12 +15,12 @@ class isothermalISM(object):
     glenns_n = 3 #power of glenn's flow law
     nodes_past_divide = 20 #used to add things to mass balance
     
-    def __init__(self,num_nodes,dx,bslip_1, bslip_2, bslip_3, b): #initializes the model's fields
+    def __init__(self,num_nodes,dx,bslip, b): #initializes the model's fields
         self.dx = dx 
-        self.bslip_1 = bslip_1
-        self.bslip_2 = bslip_2
-        self.bslip_3 = bslip_3
-        self.num_nodes = num_nodes + 20
+        self.bslip = bslip
+        for i in range(self.nodes_past_divide):
+            self.bslip.append(.00022)#hopefully this works
+        self.num_nodes = num_nodes + self.nodes_past_divide
 
         self.time = 0 
         self.x= np.array(range(0,((self.num_nodes)*self.dx),self.dx)) 
@@ -58,13 +58,8 @@ class isothermalISM(object):
         D = np.zeros(self.num_nodes)
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         for i in range(0,self.num_nodes):
-            if(i<20):
-                D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_1*self.p*self.g*(self.ice_thickness[i]**2))
-            elif(i<40):
-                D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_2*self.p*self.g*(self.ice_thickness[i]**2))
-            else:
-                D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip_3*self.p*self.g*(self.ice_thickness[i]**2))
-        
+            D[i] = (((-2*self.glenns_a*(self.p*self.g)**self.glenns_n)/(self.glenns_n+2))*(self.ice_thickness[i]**(self.glenns_n+2))*(abs((slopes[i])**(self.glenns_n-1))))-(self.bslip[i]*self.p*self.g*(self.ice_thickness[i]**2))
+  
         A = sparse.lil_matrix((self.num_nodes,self.num_nodes)) 
         A[0, 0] = 1 
         A[self.num_nodes-1, self.num_nodes-1] = 1 
@@ -92,7 +87,7 @@ class isothermalISM(object):
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         velocity = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
-            velocity[i] = ((-(2*self.glenns_a*(self.p*-9.81)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.slide_parameter*self.p*-9.81*self.ice_thickness[i]*slopes[i])
+            velocity[i] = ((-(2*self.glenns_a*(self.p*-9.81)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.bslip[i]*self.p*-self.g*self.ice_thickness[i]*slopes[i])
             print('velocity at node ', i, 'is: ', velocity[i])
 
     def get_ice_thickness(self):
@@ -104,9 +99,20 @@ class isothermalISM(object):
 def main():
     b0 = [-53.86014283247338, -96.55148545680116, -209.56378728526175, -329.5285447843742, -276.1078577736731, -99.4682311472077, -74.60838257235906, 103.76931702628877, 199.59759885797695, 325.49387992076936, 294.9387516971606, 190.74077827555544, 95.99117577626988, 252.4851292030383, 410.3736616110993, 500, 500, 444.71357635367707, 326.35184433516275, 223.25791552817049, 98.55471776145947, 134.18167926051117, 30.336550811088184, -88.39136174706994, -121.36948314990242, -18.45822543176338, -66.01158355801323, 52.93628093781889, -92.66509252409524, 15.70587677548626, -22.132177754463765, 6.391541935525751, -68.42339808954196, 39.59640808291448, 53.464027842215515, 136.78502122848863, 254.14520471035019, 192.5665648106059, 65.30439277418417, 14.10079843084735, -114.02424000705798, -289.4634592194706, -303.0305745281302, -266.62019841090347, -198.4732468197231, -210.421471160374, -143.2408448139692, -66.7972463258127, -18.769521382966776, 46.9742033841991, 105.26603075720368, 164.98279637713722, -43.50064538327361, -79.11047511726842, -3.8891318593645394, 12.390579201231496, -59.56957705146683, 0]
     base = tools.load_nolan_bedrock()
-    b0 = map(operator.add, base, b0)
+    b0 = base #map(operator.add, base, b0)
 
-    run1 = isothermalISM(58, 1000, 0.0015, .0005, 0.00022, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
+    print len(b0)
+
+    bslip = []
+    step = (.00022-.0015)/57 #these are values from previous 3-number bslip, maybe should try others
+    start = .0015
+    for i in range (58):
+        bslip.append(start)
+        start += step
+    
+    print bslip
+    print len(bslip)
+    run1 = isothermalISM(58, 1000, bslip, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
     run1.openOutput('run1.nc')
 
     for i in range(1500): #5000 years
