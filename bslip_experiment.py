@@ -23,3 +23,4 @@ for i in start:
         print 'for start', i, 'and stop', j,'surface difference is', tools.calculate_surface_difference(run1.get_surface_elev() ,obs_surf)
 
 #first experiment gives lowest difference for start .00125 and stop .0001, updating start and stop again reflecting this
+#2nd round: for start 0.001125 and stop 2.5e-05 surface difference is 617.017416276
