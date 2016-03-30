@@ -15,7 +15,7 @@ for i in start:
         for k in range(58):
             bslip.append(temp)
             temp += step
-        run1 = basic_model.isothermalISM(58, 1000, bslip, b0[:])
+        run1 = basic_model.isothermalISM(58, 1000, bslip[:], b0[:])
         for k in range(1500): #5000 years
             run1.timestep(1)
             #if(k%100==0): 
