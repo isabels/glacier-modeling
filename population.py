@@ -7,6 +7,7 @@ import tools
 import csv
 import operator
 import pp
+import os
 
 class Individual(object):
 
@@ -114,12 +115,14 @@ def main():
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction(50)
 	population = Population(5, 58, -500, 500, fitness_function) #!!! change back population size
-	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	#population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	dirname = 'exp2.1'
+	os.mkdir(dirname)
 	while((population.best_fitness() > 0) and (population.generation <= 50)):
 		population.evolve()
-		population.run_models(True,job_server)
-		print population.best_fitness(True) #now this reflects generation that has just been done
-		population.save_iteration('ex2.1_generation%d.csv' % population.generation)
+		#population.run_models(True,job_server)
+		#print population.best_fitness(True) #now this reflects generation that has just been done
+		population.save_iteration('exp2.1/generation%d.csv' % population.generation)
 	print "Experiment has finished."
 
 
