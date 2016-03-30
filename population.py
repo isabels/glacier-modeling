@@ -113,17 +113,58 @@ def run_model(bed, run, fitness_function): #runs one model. for parallelization.
 def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
-	fitness_function = evaluate.FitnessFunction(50)
-	population = Population(5, 58, -500, 500, fitness_function) #!!! change back population size
+
+	#experiment 1, roughness penalty 0.
+	fitness_function = evaluate.FitnessFunction(0)
+	population = Population(200, 58, -500, 500, fitness_function) 
 	#population.run_models(True,job_server) #initial run at generation 0 before we start evolving
 	dirname = 'exp2.1'
 	os.mkdir(dirname)
 	while((population.best_fitness() > 0) and (population.generation <= 50)):
 		population.evolve()
 		#population.run_models(True,job_server)
-		#print population.best_fitness(True) #now this reflects generation that has just been done
+		print population.best_fitness(True) #now this reflects generation that has just been done
 		population.save_iteration('exp2.1/exp2.1_generation%d.csv' % population.generation)
-	print "Experiment has finished."
+	print "Experiment 2.1 has finished."
+
+	#experiment 2, roughness penalty 50
+	fitness_function = evaluate.FitnessFunction(50)
+	population = Population(200, 58, -500, 500, fitness_function) #
+	#population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	dirname = 'exp2.2'
+	os.mkdir(dirname)
+	while((population.best_fitness() > 0) and (population.generation <= 50)):
+		population.evolve()
+		#population.run_models(True,job_server)
+		print population.best_fitness(True) #now this reflects generation that has just been done
+		population.save_iteration('exp2.2/exp2.2_generation%d.csv' % population.generation)
+	print "Experiment 2.2 has finished."
+
+	#experiment 3, roughness penalty 25
+	fitness_function = evaluate.FitnessFunction(25)
+	population = Population(200, 58, -500, 500, fitness_function) #!!! change back population size
+	#population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	dirname = 'exp2.3'
+	os.mkdir(dirname)
+	while((population.best_fitness() > 0) and (population.generation <= 50)):
+		population.evolve()
+		#population.run_models(True,job_server)
+		print population.best_fitness(True) #now this reflects generation that has just been done
+		population.save_iteration('exp2.3/exp2.3_generation%d.csv' % population.generation)
+	print "Experiment 2.3 has finished."
+
+	#experiment 4, roughness penalty 15
+	fitness_function = evaluate.FitnessFunction(15)
+	population = Population(200, 58, -500, 500, fitness_function) #!!! change back population size
+	#population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	dirname = 'exp2.4'
+	os.mkdir(dirname)
+	while((population.best_fitness() > 0) and (population.generation <= 50)):
+		population.evolve()
+		#population.run_models(True,job_server)
+		print population.best_fitness(True) #now this reflects generation that has just been done
+		population.save_iteration('exp2.4/exp2.4_generation%d.csv' % population.generation)
+	print "Experiment 2.4 has finished."
 
 
 
