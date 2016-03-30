@@ -122,7 +122,7 @@ def main():
 		population.evolve()
 		#population.run_models(True,job_server)
 		#print population.best_fitness(True) #now this reflects generation that has just been done
-		population.save_iteration('exp2.1/generation%d.csv' % population.generation)
+		population.save_iteration('exp2.1/exp2.1_generation%d.csv' % population.generation)
 	print "Experiment has finished."
 
 
