@@ -113,15 +113,15 @@ def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
 	fitness_function = evaluate.FitnessFunction()
-	population = Population(5, 58, -500, 500, fitness_function)
+	population = Population(200, 58, -500, 500, fitness_function)
 	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
 	
-	while(population.best_fitness() > 500):
+	while((population.best_fitness() > 0) and () and (generation <= 50)):
 		population.evolve()
 		population.run_models(True,job_server)
 		print population.best_fitness(True) #now this reflects generation that has just been done
-		population.save_iteration('generation%d.csv' % population.generation)
-	print "best fitness better than 500, program has finished."
+		population.save_iteration('ex2.1_generation%d.csv' % population.generation)
+	print "Experiment 2.1 has finished."
 
 
 
@@ -129,7 +129,3 @@ def main():
 if __name__=='__main__':
     main()
 
-#experiments to run/things to do:
-#figure out why the hell average starting fitness is so high. it wasn't in my bed parameters tests.
-#experiment with larger population (500?)
-#something w/ overall smoothing applied after mutation?
