@@ -39,9 +39,7 @@ class isothermalISM(object):
             val += step
         for i in range(self.nodes_past_divide):
             self.bslip.append(self.bslip[57-i])
-            #if val stays that high then it piles up on wrong side of divide
-        print len(self.bslip)
-    
+            #if val stays that high then it piles up on wrong side of divide    
 
     def openOutput(self,fname): #sets up a file to copy each timestep's data into
         self.writeCounter = 0 
