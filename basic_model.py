@@ -129,11 +129,8 @@ class isothermalISM(object):
 
 def main():
     base = tools.load_nolan_bedrock()
-<<<<<<< HEAD
     b0 = base#map(operator.add, base, b0)
-=======
-    b0 = base #map(operator.add, base, b0)
->>>>>>> master
+
 
     run1 = isothermalISM(58, 1000, .001125, .000025, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
     run1.openOutput('run1.nc')
