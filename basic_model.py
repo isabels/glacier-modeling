@@ -96,7 +96,7 @@ class isothermalISM(object):
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         velocity = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
-            velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])#-(self.bslip_1*self.p*-self.g*self.ice_thickness[i]*slopes[i])
+            velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])-(self.bslip[i]*self.p*-self.g*self.ice_thickness[i]*slopes[i])
 
             print 'velocity at node ', i, 'is: ', velocity[i]
         return velocity
