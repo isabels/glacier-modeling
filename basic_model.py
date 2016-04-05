@@ -96,29 +96,18 @@ class isothermalISM(object):
         slopes = tools.calculate_slopes(self.surface_elev, self.dx) 
         velocity = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
-            if(i<20):
-                velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])#-(self.bslip_1*self.p*-self.g*self.ice_thickness[i]*slopes[i])
+            velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])#-(self.bslip_1*self.p*-self.g*self.ice_thickness[i]*slopes[i])
 
-            elif(i<40):
-                velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])#-(self.bslip_2*self.p*-self.g*self.ice_thickness[i]*slopes[i])
-
-            else:
-                velocity[i] = ((-(2*self.glenns_a*(self.p*-self.g)**self.glenns_n)/(self.glenns_n+1))*(self.ice_thickness[i]**(self.glenns_n+1))*(abs((slopes[i])**(self.glenns_n-1))))*(slopes[i])#-(self.bslip_3*self.p*-self.g*self.ice_thickness[i]*slopes[i])
             print 'velocity at node ', i, 'is: ', velocity[i]
+        return velocity
 
     def calculate_basal_velocity(self): #this calculates the basal sliding portion of velocity to see if it's reasonable
         slopes = tools.calculate_slopes(self.surface_elev, self.dx)
         basal_velocity = np.zeros(self.num_nodes)
         for i in range(self.num_nodes):
-            if(i<20):
-                basal_velocity[i] = -(self.bslip_1*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
-
-            elif(i<40):
-                basal_velocity[i] = -(self.bslip_2*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
-
-            else:
-                basal_velocity[i] = -(self.bslip_3*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
+            basal_velocity[i] = -(self.bslip[i]*self.p*-self.g*self.ice_thickness[i]*slopes[i]) #g should be negative??)
             print 'basal velocity at node ', i, 'is: ', basal_velocity[i]
+        return basal_velocity
 
 
     def get_ice_thickness(self):
@@ -140,8 +129,8 @@ def main():
         if(i%100==0): 
             print 'on timestep', i
             run1.write()
-    run1.calculate_basal_velocity()  
-    run1.calculate_velocity() 
+    basal = run1.calculate_basal_velocity()  
+    deformation = run1.calculate_velocity() 
     run1.close()
     tools.plot_model_run('run1.nc')
 
