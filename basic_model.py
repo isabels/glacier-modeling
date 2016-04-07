@@ -121,7 +121,7 @@ def main():
     b0 = base#map(operator.add, base, b0)
 
 
-    run1 = isothermalISM(58, 1000, .001125, .000025, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
+    run1 = isothermalISM(58, 1000, 1e-16, 1e-16, b0)#.001125, .000025, b0) #55 nodes, 1000-meter spacing,  basal slip was .0005
     run1.openOutput('run1.nc')
 
     for i in range(1500): #5000 years
@@ -129,7 +129,7 @@ def main():
         if(i%100==0): 
             print 'on timestep', i
             run1.write()
-    #basal = run1.calculate_basal_velocity()  
+    basal = run1.calculate_basal_velocity()  
     #deformation = run1.calculate_velocity() 
     run1.close()
     tools.plot_model_run('run1.nc')
