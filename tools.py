@@ -17,15 +17,14 @@ def load_mbal(fulldata=False, index = 4): #index refers to which mbal: 1 for no 
 	#includes points past divide
 	mbal=[]
 	count = 0
-
-	with open('all_mbal.csv', 'rU') as csvfile:
-		reader = csv.reader(csvfile, dialect='excel')
-		for row in reader:
-			if(fulldata):
-				mbal.append(float(row[index]))
-			elif(count%10 == 0):
-				mbal.append(float(row[index]))
-			count += 1
+	f = open('all_mbal.csv', 'r')
+	for line in f.readlines()[1:]:
+		data = line.split(',')
+		if(fulldata):
+			mbal.append(float(data[index]))
+		elif(count%10 == 0):
+			mbal.append(float(data[index]))
+		count += 1
 	for i in range(20): #stupid hack to deal with continuation past divide
 		mbal.append(7)
 	return mbal
