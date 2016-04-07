@@ -28,7 +28,7 @@ class isothermalISM(object):
         for i in range(1210, 410, -40):
             self.bed_elev.append(i)
         self.surface_elev= self.bed_elev #start with no ice
-        self.mass_balance = tools.load_mbal(index=1)
+        self.mass_balance = tools.load_mbal(index=4)
 
     def generate_bslip_array(self, bslip_start, bslip_stop):
         self.bslip = []
@@ -129,8 +129,8 @@ def main():
         if(i%100==0): 
             print 'on timestep', i
             run1.write()
-    basal = run1.calculate_basal_velocity()  
-    deformation = run1.calculate_velocity() 
+    #basal = run1.calculate_basal_velocity()  
+    #deformation = run1.calculate_velocity() 
     run1.close()
     tools.plot_model_run('run1.nc')
 
