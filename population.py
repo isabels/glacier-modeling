@@ -7,6 +7,7 @@ import tools
 import csv
 import operator
 import pp
+import os
 
 class Individual(object):
 
@@ -74,7 +75,7 @@ class Population(object):
 				#gotta do this in serial first, because it's an argument to isothermalISM, which needs to be created in serial (or so it seems. but it's working now so i'm not gonna mess with it)
 				self.individuals[i].bed = map(operator.add, self.individuals[i].parameters, self.base)
 			#creates list of tuples of i and job running i's model
-			jobs = [(i, job_server.submit(run_model,(self.individuals[i].bed, basic_model.isothermalISM(58, 1000, .0015, .0005, .00022, self.individuals[i].bed[:]), self.fitness_function), (), ("operator", "basic_model", "tools"))) for i in range(self.n)]
+			jobs = [(i, job_server.submit(run_model,(self.individuals[i].bed, basic_model.isothermalISM(58, 1000, .001125, .000025, self.individuals[i].bed[:]), self.fitness_function), (), ("operator", "basic_model", "tools"))) for i in range(self.n)]
 			print 'jobs created'
 			for i, job in jobs:
 				self.individuals[i].fitness = job()
@@ -83,7 +84,7 @@ class Population(object):
 		else:
 			for i in range(self.n):
 				self.individuals[i].bed = map(operator.add, self.base, self.individuals[i].parameters)
-				run = basic_model.isothermalISM(58, 1000, .0015, .0005, .00022, self.individuals[i].bed[:])
+				run = basic_model.isothermalISM(58, 1000, .001125, .000025, self.individuals[i].bed[:])
 				for j in range(2000):
 					run.timestep(1)				
 				self.individuals[i].surface = run.get_surface_elev()
@@ -112,16 +113,17 @@ def run_model(bed, run, fitness_function): #runs one model. for parallelization.
 def main():
 	job_server = pp.Server()
 	print 'Currently using', job_server.get_ncpus(), 'cpus'
-	fitness_function = evaluate.FitnessFunction()
-	population = Population(5, 58, -500, 500, fitness_function)
-	population.run_models(True,job_server) #initial run at generation 0 before we start evolving
-	
-	while(population.best_fitness() > 500):
+	fitness_function = evaluate.FitnessFunction(50)
+	population = Population(5, 58, -500, 500, fitness_function) #!!! change back population size
+	#population.run_models(True,job_server) #initial run at generation 0 before we start evolving
+	dirname = 'exp2.1'
+	os.mkdir(dirname)
+	while((population.best_fitness() > 0) and (population.generation <= 50)):
 		population.evolve()
-		population.run_models(True,job_server)
-		print population.best_fitness(True) #now this reflects generation that has just been done
-		population.save_iteration('generation%d.csv' % population.generation)
-	print "best fitness better than 500, program has finished."
+		#population.run_models(True,job_server)
+		#print population.best_fitness(True) #now this reflects generation that has just been done
+		population.save_iteration('exp2.1/generation%d.csv' % population.generation)
+	print "Experiment has finished."
 
 
 
@@ -129,7 +131,3 @@ def main():
 if __name__=='__main__':
     main()
 
-#experiments to run/things to do:
-#figure out why the hell average starting fitness is so high. it wasn't in my bed parameters tests.
-#experiment with larger population (500?)
-#something w/ overall smoothing applied after mutation?
