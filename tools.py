@@ -13,18 +13,18 @@ def calculate_slopes(elev, dx):
 	slopes[len(elev)-1] = (elev[len(elev)-1] - elev[len(elev)-2]) / dx
 	return slopes
 
-def load_mbal(filename, fulldata=False):
+def load_mbal(fulldata=False, index = 4): #index refers to which mbal: 1 for no tributaries, 2 for first adjustment, etc... (4 is one i've been using)
 	#includes points past divide
 	mbal=[]
 	count = 0
 
-	with open(filename, 'rU') as csvfile:
+	with open('all_mbal.csv', 'rU') as csvfile:
 		reader = csv.reader(csvfile, dialect='excel')
 		for row in reader:
 			if(fulldata):
-				mbal.append(float(row[1]))
+				mbal.append(float(row[index]))
 			elif(count%10 == 0):
-				mbal.append(float(row[1]))
+				mbal.append(float(row[index]))
 			count += 1
 	for i in range(20): #stupid hack to deal with continuation past divide
 		mbal.append(7)
