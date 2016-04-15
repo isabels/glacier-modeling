@@ -21,12 +21,12 @@ def load_mbal(fulldata=False, index = 4): #index refers to which mbal: 1 for no 
 	for line in f.readlines()[1:]:
 		data = line.split(',')
 		if(fulldata):
-			mbal.append(float(data[index]) / 31536000) #makes this units of m/s instead of m/year. WHOOPS.
+			mbal.append(float(data[index]) )#/ 31536000) #makes this units of m/s instead of m/year. WHOOPS.
 		elif(count%10 == 0):
-			mbal.append(float(data[index]) / 31536000)
+			mbal.append(float(data[index]) )#/ 31536000)
 		count += 1
 	for i in range(20): #stupid hack to deal with continuation past divide
-		mbal.append(7/31536000)
+		mbal.append(7)#/31536000)
 	return mbal
 
 def load_bedtopo():
@@ -67,7 +67,7 @@ def plot_model_run(fname): #reads and plots data from the output file
 		mp.plot(x, elev[i], 'blue')
 	mp.plot(x, elev[len(time)-1], 'cyan')
 	surf_elev = load_first_guess_surface()
-	#mp.plot(range(0, 57000, 1000), surf_elev, 'red')
+	mp.plot(range(0, 57000, 1000), surf_elev, 'red')
 	mp.plot(range(0, 58000, 1000), load_nolan_bedrock(), 'black')
 	diff = calculate_surface_difference(elev[len(time)-1], surf_elev)
 	mp.title(diff)

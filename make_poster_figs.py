@@ -8,7 +8,7 @@ import csv
 # matplotlib.use('Agg')
 import matplotlib.pyplot as mp
 
-f = ncdf.netcdf_file('smooth.nc', 'r')
+f = ncdf.netcdf_file('v2_basic_model.nc', 'r')
 elev = f.variables['surface_elev']
 bed = f.variables['bed_elev']
 time = f.variables['time']
@@ -22,13 +22,14 @@ mp.plot(x[0:58], bed[0][0:58], 'green', label='glacier bed', lw=2)
 bed_elev = tools.load_nolan_bedrock()
 surf_elev = tools.load_first_guess_surface()
 mp.plot(x[0:57], surf_elev, 'red', label='observed surface', lw=2)
-mp.plot(x[0:58], bed_elev, 'black', label='first guess surface')
-mp.axis([-2000, 60000, -1000, 2000])
+#mp.plot(x[0:58], bed_elev, 'black', label='first guess surface')
+mp.axis([-2000, 60000, -1000, 2050])
+mp.title('Basic forward model')
 mp.ylabel('Elevation (m)')
 mp.xlabel('Distance from terminus (m)')
 # mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
 mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
-mp.savefig('smooth_no_title.png', dpi=300)
+mp.savefig('v2_forward_model.png', dpi=300)
 
 # #########and now the old model run. gonna copy and paste some code because i'm too lazy to refactor and want to be able to reproduce either figure
 # mp.clf()
@@ -80,83 +81,83 @@ mp.savefig('smooth_no_title.png', dpi=300)
 #################### showing some of the beds
 
 
-def read_in_beds(filename):
-	beds = []
-	with open(filename, 'rU') as csvfile:
-			reader = csv.reader(csvfile, dialect='excel')
-			index = 0
-			for row in reader:
-				beds.append([float(i) for i in row[0].split(',')])
-	return beds
+# def read_in_beds(filename):
+# 	beds = []
+# 	with open(filename, 'rU') as csvfile:
+# 			reader = csv.reader(csvfile, dialect='excel')
+# 			index = 0
+# 			for row in reader:
+# 				beds.append([float(i) for i in row[0].split(',')])
+# 	return beds
 
-bed_elev = tools.load_nolan_bedrock()
-fig = mp.figure()
-ax = fig.add_subplot(1,1,1)
+# bed_elev = tools.load_nolan_bedrock()
+# fig = mp.figure()
+# ax = fig.add_subplot(1,1,1)
 
-x = range(0, 58000, 1000)
-ax.plot(x, bed_elev, 'black', label='first guess surface', lw=2)
-#### WITHOUT
+# x = range(0, 58000, 1000)
+# ax.plot(x, bed_elev, 'black', label='first guess surface', lw=2)
+# #### WITHOUT
 
-beds2 = read_in_beds('generation14-exp2.csv')
-b0 = beds2[0]
-base = tools.load_nolan_bedrock()
-b0 = map(operator.add, b0, base)
+# beds2 = read_in_beds('generation14-exp2.csv')
+# b0 = beds2[0]
+# base = tools.load_nolan_bedrock()
+# b0 = map(operator.add, b0, base)
 
-ax.plot(x, b0, 'red', label='beds without roughness constraint', lw=2)
+# ax.plot(x, b0, 'red', label='beds without roughness constraint', lw=2)
 
-for i in range(1, 5):
-	b0 = beds2[i]
-	base = tools.load_nolan_bedrock()
-	b0 = map(operator.add, b0, base)
-	ax.plot(x, b0, 'red', lw=1)
-
-
-
-#STRICT
-beds = read_in_beds('generation14-exp3.csv')
-b0 = beds[0]
-base = tools.load_nolan_bedrock()
-b0 = map(operator.add, b0, base)
-
-ax.plot(x, b0, 'green', label='beds with strict roughness constraint', lw=2)
+# for i in range(1, 5):
+# 	b0 = beds2[i]
+# 	base = tools.load_nolan_bedrock()
+# 	b0 = map(operator.add, b0, base)
+# 	ax.plot(x, b0, 'red', lw=1)
 
 
 
-for i in range(1, 5):
-	b0 = beds[i]
-	base = tools.load_nolan_bedrock()
-	b0 = map(operator.add, b0, base)
+# #STRICT
+# beds = read_in_beds('generation14-exp3.csv')
+# b0 = beds[0]
+# base = tools.load_nolan_bedrock()
+# b0 = map(operator.add, b0, base)
 
-	ax.plot(x, b0, 'green', lw=1)
-
-
-
-
-### MEDIUM
-
-beds3 = read_in_beds('generation14-exp4.csv')
-b0 = beds3[0]
-base = tools.load_nolan_bedrock()
-b0 = map(operator.add, b0, base)
-ax.plot(x, b0, 'blue', label='beds with smaller roughness constraint', lw=2)
-
-for i in range(1, 5):
-	b0 = beds3[i]
-	base = tools.load_nolan_bedrock()
-	b0 = map(operator.add, b0, base)
-
-	ax.plot(x, b0, 'blue', lw=1)
-
-ax.scatter([1000,5000, 12000, 20000, 32000],[-70,-200, -500, -600, -250], label='seimsic data points')
+# ax.plot(x, b0, 'green', label='beds with strict roughness constraint', lw=2)
 
 
-ax.axis([-2000, 60000, -1000, 2000])
-mp.title('Beds with lowest error')
-mp.ylabel('Elevation (m)')
-mp.xlabel('Distance from terminus (m)')
-# mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
-mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
-fig.savefig('beds.png', dpi=300)
+
+# for i in range(1, 5):
+# 	b0 = beds[i]
+# 	base = tools.load_nolan_bedrock()
+# 	b0 = map(operator.add, b0, base)
+
+# 	ax.plot(x, b0, 'green', lw=1)
+
+
+
+
+# ### MEDIUM
+
+# beds3 = read_in_beds('generation14-exp4.csv')
+# b0 = beds3[0]
+# base = tools.load_nolan_bedrock()
+# b0 = map(operator.add, b0, base)
+# ax.plot(x, b0, 'blue', label='beds with smaller roughness constraint', lw=2)
+
+# for i in range(1, 5):
+# 	b0 = beds3[i]
+# 	base = tools.load_nolan_bedrock()
+# 	b0 = map(operator.add, b0, base)
+
+# 	ax.plot(x, b0, 'blue', lw=1)
+
+# ax.scatter([1000,5000, 12000, 20000, 32000],[-70,-200, -500, -600, -250], label='seimsic data points')
+
+
+# ax.axis([-2000, 60000, -1000, 2000])
+# mp.title('Beds with lowest error')
+# mp.ylabel('Elevation (m)')
+# mp.xlabel('Distance from terminus (m)')
+# # mp.annotate('Matthes-\nLlewellyn\n divide', xy=(57000, 1200), xytext=(52000, 500), arrowprops=dict(facecolor='black', shrink=0.1))
+# mp.legend(loc='upper left', fontsize='small', borderaxespad=1.5)
+# fig.savefig('beds.png', dpi=300)
 
 ##### GENERATION COMPARISON
 # bed_elev = tools.load_nolan_bedrock()
