@@ -6,9 +6,10 @@ import operator
 class FitnessFunction(object):
 	penalty = 1000.
 
-	def __init__(self):
+	def __init__(self, roughness_penalty):
 		self.gps_surface = tools.load_first_guess_surface()
 		self.nolan_bed = tools.load_nolan_bedrock()
+		self.roughness_penalty = roughness_penalty
 
 	def constrain_to_nolan(self,bed_elev):
 		nodes_to_check = (1,5, 12, 20, 32)
@@ -29,15 +30,14 @@ class FitnessFunction(object):
 		return 0
 
 	def smoothness_constraint(self, bed_elev): #penalizes for each wiggle that is not in the direction of the greater slope
-		pen = 50
 		total = 0
 		for i in range(1, len(bed_elev)):
 			if (i<=20): #sloping down still
 				if (bed_elev[i] > bed_elev[i-1]):
-					total += pen
+					total += self.roughness_penalty
 			else: #sloping up now
 				if(bed_elev[i] < bed_elev[i-1]):
-					total += pen
+					total += self.roughness_penalty
 		return total
 
 
